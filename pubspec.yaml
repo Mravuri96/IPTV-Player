@@ -1,0 +1,68 @@
+name: IPTV
+description: IPTV Viewer
+
+publish_to: "none"
+
+version: 1.0.0+1
+environment:
+  sdk:
+  flutter:
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons:
+  animations:
+  google_fonts:
+  dio:
+  dio_cookie_manager:
+  dio_http2_adapter:
+  dio_flutter_transformer:
+  retrofit:
+  freezed_annotation:
+  logger:
+  meta:
+  intl:
+  characters:
+  unicode:
+  flutter_staggered_animations:
+  json_annotation:
+  archive:
+  hive_flutter:
+  #Video Players
+  better_player:
+  video_player:
+  # video_player_web:
+  video_player_web_hls:
+  vidflux:
+    git:
+      url: https://github.com/Mravuri96/vidflux.git
+      ref: 0c07cde2175b4c9f9c5cf753ef8accb1a929eef
+  get:
+  flutter_hooks:
+  hooks_riverpod:
+  dartx:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  test:
+  build_runner:
+  build_web_compilers:
+  freezed:
+  quiver:
+  hive_generator:
+  retrofit_generator:
+  json_serializable:
+  pedantic:
+  effective_dart:
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/streams.zip
+    - assets/channels.json
+    
+scripts:
+  build: flutter pub run build_runner build --release --delete-conflicting-outputs
+  watch: flutter pub run build_runner watch --watch --delete-conflicting-outputs
