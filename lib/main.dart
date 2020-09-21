@@ -34,23 +34,13 @@ class Root extends HookWidget {
 
   @override
   Widget build(BuildContext context) => FutureBuilder<void>(
-        future: GetIp().figureOut(),
-        builder: (context, __) {
-          return HookBuilder(
-            builder: (_) => useProvider(ipTvCatCatalog).when(
-              data: (a) => GetMaterialApp(
-                themeMode: ThemeMode.dark,
-                darkTheme: dartkTheme,
-                title: '📺 IPTV',
-                home: const Home(),
-              ),
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              error: (err, __) => Text('Error: $err'),
-            ),
-          );
-        },
+        future: Future.sync(() => GetIp().figureOut()),
+        builder: (context, __) => GetMaterialApp(
+          themeMode: ThemeMode.dark,
+          darkTheme: dartkTheme,
+          title: '📺 IPTV',
+          home: const Home(),
+        ),
       );
 }
 
@@ -203,7 +193,6 @@ class IptvCatChannels extends HookWidget {
               cursorColor: Colors.black,
               keyboardType: TextInputType.text,
               onChanged: (value) => _country.value = value,
-              autofocus: true,
               toolbarOptions: const ToolbarOptions(
                 paste: true,
                 selectAll: true,

@@ -57,6 +57,9 @@ dev_dependencies:
   pedantic:
   effective_dart:
 
+dependency_overrides:
+  path_provider: 1.6.14
+
 flutter:
   uses-material-design: true
   assets:
