@@ -34,6 +34,9 @@ dependencies:
   video_player:
   # video_player_web:
   video_player_web_hls:
+    git:
+      url: https://github.com/Mravuri96/video_player_web_hls.git
+      ref: bfb8651a44029011ea6ba39ea92cb1299a41f0ea
   vidflux:
     git:
       url: https://github.com/Mravuri96/vidflux.git
@@ -42,6 +45,7 @@ dependencies:
   flutter_hooks:
   hooks_riverpod:
   dartx:
+  url_launcher:
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +60,7 @@ dev_dependencies:
   json_serializable:
   pedantic:
   effective_dart:
+  flag: ^4.0.0-pre
 
 dependency_overrides:
   path_provider: 1.6.14

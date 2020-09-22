@@ -9,6 +9,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/route_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vidflux/vidflux.dart';
 
@@ -20,14 +21,17 @@ import 'Theme/theme.dart';
 import 'Util/countires.dart';
 import 'Util/util.dart';
 
-Future<void> main() async => runZonedGuarded(
-      () => runApp(
-        const ProviderScope(
-          child: Root(),
-        ),
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  return runZonedGuarded(
+    () => runApp(
+      const ProviderScope(
+        child: Root(),
       ),
-      (err, stk) => Logger().e('$err $stk'),
-    );
+    ),
+    (err, stk) => Logger().e('$err $stk'),
+  );
+}
 
 class Root extends HookWidget {
   const Root({Key key}) : super(key: key);
@@ -75,6 +79,7 @@ class Home extends HookWidget {
                   ),
                 ],
               ),
+              floatingActionButton: _fab,
             )
           : Scaffold(
               body: PageTransitionSwitcher(
@@ -90,7 +95,82 @@ class Home extends HookWidget {
               bottomNavigationBar: const SideBar(
                 isMobile: true,
               ),
+              floatingActionButton: _fab,
             ),
+    );
+  }
+
+  FloatingActionButton get _fab => FloatingActionButton.extended(
+        backgroundColor: const Color.fromARGB(255, 48, 48, 48),
+        label: const Text(
+          'Custom url',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        icon: const Icon(
+          Icons.edit,
+          color: Color(0xffFCCFA8),
+        ),
+        onPressed: () async => Get.dialog(
+          const CustomDialog(),
+          useRootNavigator: false,
+        ),
+      );
+}
+
+class CustomDialog extends HookWidget {
+  const CustomDialog({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _url = useState('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8');
+
+    return AlertDialog(
+      title: const Text('Enter .m3u8 url'),
+      content: SizedBox(
+        width: MediaQuery.of(context).size.width * .9,
+        child: TextFormField(
+          decoration: const InputDecoration(
+            icon: Icon(Icons.link),
+          ),
+          initialValue: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          onChanged: (newValue) => _url.value = newValue,
+          validator: (url) => !url.startsWith('https')
+              ? 'url must start with https'
+              : !url.endsWith('.m3u8')
+                  ? 'url must end with .m3u8'
+                  : null,
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () async => Get.back(
+            closeOverlays: true,
+          ),
+          child: const Text(
+            'Cancel',
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            Get.back(
+              closeOverlays: true,
+            );
+            return Get.to(
+              TvPlayer(
+                url: _url.value,
+                catalog: 2,
+              ),
+              preventDuplicates: true,
+            );
+          },
+          child: const Text(
+            'Watch',
+          ),
+        ),
+      ],
     );
   }
 }
@@ -140,6 +220,21 @@ class SideBar extends HookWidget {
                       ),
                     ),
                   ),
+                ),
+              ),
+              Tooltip(
+                message: 'Report an issue with the website.',
+                child: OutlinedButton(
+                  onPressed: () async {
+                    const url =
+                        'https://github.com/Mravuri96/IPTV-Player/issues';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      return Logger().e('Couldnt launch $url');
+                    }
+                  },
+                  child: const Icon(Icons.bug_report),
                 ),
               ),
             ]),
@@ -499,35 +594,29 @@ class _VideoPlayerState extends State<TvPlayer> {
       widget.catalog == 0
           ? widget.url.substring(0, widget.url.length - 22)
           : widget.url,
-    )..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
-      });
+    )..initialize().then((_) => setState(() {}));
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: _controller.value.initialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VidFlux(
-                  videoPlayerController: _controller,
-                  autoPlay: true,
-                ),
-              )
-            : const SizedBox(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => setState(() => _controller.value.isPlaying
-            ? _controller.pause()
-            : _controller.play()),
-        child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: _controller.value.initialized
+              ? AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(
+                    _controller,
+                  ),
+                )
+              : const SizedBox(),
         ),
-      ),
-    );
-  }
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => setState(() => _controller.value.isPlaying
+              ? _controller.pause()
+              : _controller.play()),
+          child: Icon(
+            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          ),
+        ),
+      );
 }
