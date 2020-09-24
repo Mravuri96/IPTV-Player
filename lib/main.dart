@@ -1,24 +1,88 @@
-import 'dart:async';
+import 'dart:async' show Future, runZonedGuarded;
 
-import 'package:animations/animations.dart';
+import 'package:animations/animations.dart'
+    show FadeThroughTransition, PageTransitionSwitcher;
 import 'package:dartx/dartx.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart'
+    show
+        DiagnosticPropertiesBuilder,
+        DiagnosticsProperty,
+        IntProperty,
+        Key,
+        StringProperty,
+        required;
+import 'package:flutter/material.dart'
+    show
+        AlertDialog,
+        AnimatedSwitcher,
+        AppBar,
+        AspectRatio,
+        AutovalidateMode,
+        Axis,
+        BoxFit,
+        BuildContext,
+        Card,
+        Center,
+        CircularProgressIndicator,
+        Color,
+        Colors,
+        CustomScrollView,
+        EdgeInsets,
+        ElevatedButton,
+        Expanded,
+        FlatButton,
+        Flex,
+        FloatingActionButton,
+        FutureBuilder,
+        GridTileBar,
+        GridView,
+        Icon,
+        Icons,
+        Image,
+        InputBorder,
+        InputDecoration,
+        Key,
+        MainAxisAlignment,
+        MediaQuery,
+        OutlinedButton,
+        RotatedBox,
+        Row,
+        Scaffold,
+        Size,
+        SizedBox,
+        SliverAppBar,
+        SliverChildBuilderDelegate,
+        SliverGrid,
+        SliverGridDelegateWithMaxCrossAxisExtent,
+        SliverPadding,
+        State,
+        Text,
+        TextField,
+        TextFormField,
+        TextInputType,
+        TextOverflow,
+        TextStyle,
+        ThemeMode,
+        ToolbarOptions,
+        Tooltip,
+        Widget,
+        WidgetsFlutterBinding,
+        required,
+        runApp;
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/route_manager.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:video_player/video_player.dart';
-import 'package:vidflux/vidflux.dart';
+import 'package:logger/logger.dart' show Logger;
+import 'package:url_launcher/url_launcher.dart' show canLaunch, launch;
+import 'package:video_player/video_player.dart'
+    show VideoPlayer, VideoPlayerController;
 
-import 'Controllers/catalog_provider.dart';
-import 'Controllers/geoip.dart';
-import 'Controllers/iptv_cat.dart';
-import 'Controllers/iptv_org.dart';
-import 'Theme/theme.dart';
-import 'Util/countires.dart';
+import 'Controllers/catalog_provider.dart' show catalog;
+import 'Controllers/geoip.dart' show GetIp;
+import 'Controllers/iptv_cat.dart' show countryData;
+import 'Controllers/iptv_org.dart' show ipTvOrgCatalog;
+import 'Theme/theme.dart' show dartkTheme;
+import 'Util/countires.dart' show countries;
 import 'Util/util.dart';
 
 Future<void> main() async {
@@ -328,8 +392,6 @@ class IptvCatChannels extends HookWidget {
                 );
               },
               childCount: _countryList.length,
-              addAutomaticKeepAlives: false,
-              addRepaintBoundaries: false,
             ),
           ),
         ),
@@ -343,97 +405,137 @@ class IpTvCatCountryChannelGrid extends HookWidget {
       : super(key: key);
   final String countryName;
   @override
-  Widget build(BuildContext context) => useProvider(
-        countryData(countryName),
-      ).when(
-        loading: () => const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
+  Widget build(BuildContext context) {
+    final _channel = useState('');
+
+    return useProvider(
+      countryData(countryName),
+    ).when(
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
         ),
-        error: (err, _) => Scaffold(
-          body: Center(
-            child: Text('Error: $err'),
-          ),
+      ),
+      error: (err, _) => Scaffold(
+        body: Center(
+          child: Text('Error: $err'),
         ),
-        data: (channels) => (channels == null || channels.isEmpty)
-            ? Scaffold(
-                appBar: AppBar(
-                  title: Text(
-                    countryName.toUpperCase(),
-                  ),
+      ),
+      data: (channels) {
+        if (channels == null || channels.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                countryName.toUpperCase(),
+              ),
+            ),
+            body: Center(
+              child: Text(
+                'No public channels found for $countryName 😥',
+                textScaleFactor: 2,
+              ),
+            ),
+          );
+        } else {
+          final _channelList = channels.filter(
+            (element) => element.channel.toLowerCase().contains(
+                  _channel.value.toLowerCase(),
                 ),
-                body: Center(
-                  child: Text(
-                    'No public channels found for $countryName 😥',
-                    textScaleFactor: 2,
+          );
+          return Scaffold(
+            appBar: AppBar(
+              title: Card(
+                color: const Color(0xffFCCFA8),
+                child: TextField(
+                  decoration: const InputDecoration(
+                    enabledBorder: InputBorder.none,
+                    border: InputBorder.none,
+                    focusColor: Colors.grey,
+                    fillColor: Colors.grey,
+                    hoverColor: Colors.grey,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              )
-            : Scaffold(
-                appBar: AppBar(
-                  title: ListTile(
-                    title: Text(
-                      countryName.toUpperCase(),
-                    ),
-                    subtitle: Text(
-                      'Last Updated : ${channels?.first?.lastChecked?.toString()?.substring(0, 11) ?? ''}',
-                      overflow: TextOverflow.clip,
-                    ),
-                  ),
-                ),
-                body: Center(
-                  child: GridView.builder(
-                    primary: true,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: channels.length,
-                    shrinkWrap: true,
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 400,
-                      childAspectRatio: 3 / 1,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemBuilder: (context, index) {
-                      final _channel = channels.elementAt(index);
-                      return ElevatedButton(
-                        onPressed: () async => Get.to(
-                          TvPlayer(
-                            url: _channel.link,
-                            catalog: 0,
-                          ),
-                          preventDuplicates: true,
-                        ),
-                        child: GridTileBar(
-                          title: Text(
-                            _channel.channel,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.black),
-                            maxLines: 2,
-                          ),
-                          subtitle: Text(
-                            '${int.parse(
-                                  _channel.mbps.removeSuffix(', ...'),
-                                ) / 1000} mpbs',
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                          trailing: _channel.format == 'hd'
-                              ? const Icon(
-                                  Icons.hd,
-                                  color: Colors.black,
-                                )
-                              : const Icon(
-                                  Icons.fiber_dvr,
-                                  color: Colors.black,
-                                ),
-                        ),
-                      );
-                    },
+                  style: const TextStyle(color: Colors.black),
+                  cursorColor: Colors.black,
+                  keyboardType: TextInputType.text,
+                  onChanged: (value) => _channel.value = value,
+                  toolbarOptions: const ToolbarOptions(
+                    paste: true,
+                    selectAll: true,
+                    copy: true,
+                    cut: true,
                   ),
                 ),
               ),
-      );
+            ),
+            bottomNavigationBar: SizedBox(
+              height: 52,
+              child: GridTileBar(
+                title: Text(
+                  countryName.toUpperCase(),
+                  overflow: TextOverflow.clip,
+                ),
+                subtitle: Text(
+                    'Last Updated: ${channels?.first?.lastChecked?.toString()?.substring(0, 11) ?? ''}'),
+              ),
+            ),
+            body: Center(
+              child: GridView.builder(
+                primary: true,
+                padding: const EdgeInsets.all(16),
+                itemCount: _channelList.length,
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 400,
+                  childAspectRatio: 3 / 1,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemBuilder: (context, index) {
+                  final _channel = _channelList.elementAt(index);
+                  return ElevatedButton(
+                    onPressed: () async => Get.to(
+                      TvPlayer(
+                        url: _channel.link,
+                        catalog: 0,
+                      ),
+                      preventDuplicates: true,
+                    ),
+                    child: GridTileBar(
+                      title: Text(
+                        _channel.channel,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.black),
+                        maxLines: 2,
+                      ),
+                      subtitle: Text(
+                        '${int.parse(
+                              _channel.mbps.removeSuffix(', ...'),
+                            ) / 1000} mpbs',
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                      trailing: _channel.format == 'hd'
+                          ? const Icon(
+                              Icons.hd,
+                              color: Colors.black,
+                            )
+                          : const Icon(
+                              Icons.fiber_dvr,
+                              color: Colors.black,
+                            ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -567,8 +669,10 @@ class TvPlayer extends StatefulHookWidget {
 
   final int catalog;
   final String url;
+
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
+
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);

@@ -13,34 +13,24 @@ dependencies:
     sdk: flutter
   cupertino_icons:
   animations:
-  google_fonts:
   dio:
   dio_cookie_manager:
   dio_http2_adapter:
   dio_flutter_transformer:
-  retrofit:
   freezed_annotation:
   logger:
   meta:
   intl:
   characters:
-  unicode:
   flutter_staggered_animations:
   json_annotation:
   archive:
-  hive_flutter:
-  #Video Players
-  better_player:
   video_player:
   # video_player_web:
   video_player_web_hls:
     git:
       url: https://github.com/Mravuri96/video_player_web_hls.git
       ref: bfb8651a44029011ea6ba39ea92cb1299a41f0ea
-  vidflux:
-    git:
-      url: https://github.com/Mravuri96/vidflux.git
-      ref: 0c07cde2175b4c9f9c5cf753ef8accb1a929eef
   get:
   flutter_hooks:
   hooks_riverpod:
@@ -60,10 +50,6 @@ dev_dependencies:
   json_serializable:
   pedantic:
   effective_dart:
-  flag: ^4.0.0-pre
-
-dependency_overrides:
-  path_provider: 1.6.14
 
 flutter:
   uses-material-design: true

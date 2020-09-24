@@ -17,8 +17,7 @@ final ipTvOrgCatalog = $_autoDispose<List<Channels>>(
                   x,
                 ),
               ),
-        )..mergeSort(
-            comparator: (a, b) => a.name.compareTo(b.name)),
+        )..mergeSort(comparator: (a, b) => a.name.compareTo(b.name)),
       )
       .whenComplete(() => ref.maintainState = true),
 );
