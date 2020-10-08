@@ -18,13 +18,13 @@ class _$ChannelsTearOff {
 
 // ignore: unused_element
   _Channels call(
-      {String name,
-      String logo,
-      String url,
-      String category,
-      List<Country> language,
-      Country country,
-      Tvg tvg}) {
+      {@HiveField(0) String name,
+      @HiveField(1) String logo,
+      @HiveField(2) String url,
+      @HiveField(3) String category,
+      @HiveField(4) List<Country> language,
+      @HiveField(5) Country country,
+      @HiveField(6) Tvg tvg}) {
     return _Channels(
       name: name,
       logo: logo,
@@ -48,12 +48,19 @@ const $Channels = _$ChannelsTearOff();
 
 /// @nodoc
 mixin _$Channels {
+  @HiveField(0)
   String get name;
+  @HiveField(1)
   String get logo;
+  @HiveField(2)
   String get url;
+  @HiveField(3)
   String get category;
+  @HiveField(4)
   List<Country> get language;
+  @HiveField(5)
   Country get country;
+  @HiveField(6)
   Tvg get tvg;
 
   Map<String, dynamic> toJson();
@@ -65,13 +72,13 @@ abstract class $ChannelsCopyWith<$Res> {
   factory $ChannelsCopyWith(Channels value, $Res Function(Channels) then) =
       _$ChannelsCopyWithImpl<$Res>;
   $Res call(
-      {String name,
-      String logo,
-      String url,
-      String category,
-      List<Country> language,
-      Country country,
-      Tvg tvg});
+      {@HiveField(0) String name,
+      @HiveField(1) String logo,
+      @HiveField(2) String url,
+      @HiveField(3) String category,
+      @HiveField(4) List<Country> language,
+      @HiveField(5) Country country,
+      @HiveField(6) Tvg tvg});
 
   $CountryCopyWith<$Res> get country;
   $TvgCopyWith<$Res> get tvg;
@@ -134,13 +141,13 @@ abstract class _$ChannelsCopyWith<$Res> implements $ChannelsCopyWith<$Res> {
       __$ChannelsCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String name,
-      String logo,
-      String url,
-      String category,
-      List<Country> language,
-      Country country,
-      Tvg tvg});
+      {@HiveField(0) String name,
+      @HiveField(1) String logo,
+      @HiveField(2) String url,
+      @HiveField(3) String category,
+      @HiveField(4) List<Country> language,
+      @HiveField(5) Country country,
+      @HiveField(6) Tvg tvg});
 
   @override
   $CountryCopyWith<$Res> get country;
@@ -181,34 +188,42 @@ class __$ChannelsCopyWithImpl<$Res> extends _$ChannelsCopyWithImpl<$Res>
 }
 
 @JsonSerializable()
+@HiveType(typeId: 2, adapterName: 'ChannelsAdapter')
 
 /// @nodoc
 class _$_Channels implements _Channels {
   const _$_Channels(
-      {this.name,
-      this.logo,
-      this.url,
-      this.category,
-      this.language,
-      this.country,
-      this.tvg});
+      {@HiveField(0) this.name,
+      @HiveField(1) this.logo,
+      @HiveField(2) this.url,
+      @HiveField(3) this.category,
+      @HiveField(4) this.language,
+      @HiveField(5) this.country,
+      @HiveField(6) this.tvg});
 
   factory _$_Channels.fromJson(Map<String, dynamic> json) =>
       _$_$_ChannelsFromJson(json);
 
   @override
+  @HiveField(0)
   final String name;
   @override
+  @HiveField(1)
   final String logo;
   @override
+  @HiveField(2)
   final String url;
   @override
+  @HiveField(3)
   final String category;
   @override
+  @HiveField(4)
   final List<Country> language;
   @override
+  @HiveField(5)
   final Country country;
   @override
+  @HiveField(6)
   final Tvg tvg;
 
   @override
@@ -262,29 +277,36 @@ class _$_Channels implements _Channels {
 
 abstract class _Channels implements Channels {
   const factory _Channels(
-      {String name,
-      String logo,
-      String url,
-      String category,
-      List<Country> language,
-      Country country,
-      Tvg tvg}) = _$_Channels;
+      {@HiveField(0) String name,
+      @HiveField(1) String logo,
+      @HiveField(2) String url,
+      @HiveField(3) String category,
+      @HiveField(4) List<Country> language,
+      @HiveField(5) Country country,
+      @HiveField(6) Tvg tvg}) = _$_Channels;
 
   factory _Channels.fromJson(Map<String, dynamic> json) = _$_Channels.fromJson;
 
   @override
+  @HiveField(0)
   String get name;
   @override
+  @HiveField(1)
   String get logo;
   @override
+  @HiveField(2)
   String get url;
   @override
+  @HiveField(3)
   String get category;
   @override
+  @HiveField(4)
   List<Country> get language;
   @override
+  @HiveField(5)
   Country get country;
   @override
+  @HiveField(6)
   Tvg get tvg;
   @override
   _$ChannelsCopyWith<_Channels> get copyWith;
@@ -299,7 +321,7 @@ class _$CountryTearOff {
   const _$CountryTearOff();
 
 // ignore: unused_element
-  _Country call({String code, String name}) {
+  _Country call({@HiveField(0) String code, @HiveField(1) String name}) {
     return _Country(
       code: code,
       name: name,
@@ -318,7 +340,9 @@ const $Country = _$CountryTearOff();
 
 /// @nodoc
 mixin _$Country {
+  @HiveField(0)
   String get code;
+  @HiveField(1)
   String get name;
 
   Map<String, dynamic> toJson();
@@ -329,7 +353,7 @@ mixin _$Country {
 abstract class $CountryCopyWith<$Res> {
   factory $CountryCopyWith(Country value, $Res Function(Country) then) =
       _$CountryCopyWithImpl<$Res>;
-  $Res call({String code, String name});
+  $Res call({@HiveField(0) String code, @HiveField(1) String name});
 }
 
 /// @nodoc
@@ -357,7 +381,7 @@ abstract class _$CountryCopyWith<$Res> implements $CountryCopyWith<$Res> {
   factory _$CountryCopyWith(_Country value, $Res Function(_Country) then) =
       __$CountryCopyWithImpl<$Res>;
   @override
-  $Res call({String code, String name});
+  $Res call({@HiveField(0) String code, @HiveField(1) String name});
 }
 
 /// @nodoc
@@ -382,17 +406,20 @@ class __$CountryCopyWithImpl<$Res> extends _$CountryCopyWithImpl<$Res>
 }
 
 @JsonSerializable()
+@HiveType(typeId: 3, adapterName: 'CountryAdapter')
 
 /// @nodoc
 class _$_Country implements _Country {
-  const _$_Country({this.code, this.name});
+  const _$_Country({@HiveField(0) this.code, @HiveField(1) this.name});
 
   factory _$_Country.fromJson(Map<String, dynamic> json) =>
       _$_$_CountryFromJson(json);
 
   @override
+  @HiveField(0)
   final String code;
   @override
+  @HiveField(1)
   final String name;
 
   @override
@@ -427,13 +454,16 @@ class _$_Country implements _Country {
 }
 
 abstract class _Country implements Country {
-  const factory _Country({String code, String name}) = _$_Country;
+  const factory _Country(
+      {@HiveField(0) String code, @HiveField(1) String name}) = _$_Country;
 
   factory _Country.fromJson(Map<String, dynamic> json) = _$_Country.fromJson;
 
   @override
+  @HiveField(0)
   String get code;
   @override
+  @HiveField(1)
   String get name;
   @override
   _$CountryCopyWith<_Country> get copyWith;
@@ -448,7 +478,10 @@ class _$TvgTearOff {
   const _$TvgTearOff();
 
 // ignore: unused_element
-  _Tvg call({String id, String name, String url}) {
+  _Tvg call(
+      {@HiveField(0) String id,
+      @HiveField(1) String name,
+      @HiveField(2) String url}) {
     return _Tvg(
       id: id,
       name: name,
@@ -468,8 +501,11 @@ const $Tvg = _$TvgTearOff();
 
 /// @nodoc
 mixin _$Tvg {
+  @HiveField(0)
   String get id;
+  @HiveField(1)
   String get name;
+  @HiveField(2)
   String get url;
 
   Map<String, dynamic> toJson();
@@ -480,7 +516,10 @@ mixin _$Tvg {
 abstract class $TvgCopyWith<$Res> {
   factory $TvgCopyWith(Tvg value, $Res Function(Tvg) then) =
       _$TvgCopyWithImpl<$Res>;
-  $Res call({String id, String name, String url});
+  $Res call(
+      {@HiveField(0) String id,
+      @HiveField(1) String name,
+      @HiveField(2) String url});
 }
 
 /// @nodoc
@@ -510,7 +549,10 @@ abstract class _$TvgCopyWith<$Res> implements $TvgCopyWith<$Res> {
   factory _$TvgCopyWith(_Tvg value, $Res Function(_Tvg) then) =
       __$TvgCopyWithImpl<$Res>;
   @override
-  $Res call({String id, String name, String url});
+  $Res call(
+      {@HiveField(0) String id,
+      @HiveField(1) String name,
+      @HiveField(2) String url});
 }
 
 /// @nodoc
@@ -537,18 +579,23 @@ class __$TvgCopyWithImpl<$Res> extends _$TvgCopyWithImpl<$Res>
 }
 
 @JsonSerializable()
+@HiveType(typeId: 4, adapterName: 'TvgAdapter')
 
 /// @nodoc
 class _$_Tvg implements _Tvg {
-  const _$_Tvg({this.id, this.name, this.url});
+  const _$_Tvg(
+      {@HiveField(0) this.id, @HiveField(1) this.name, @HiveField(2) this.url});
 
   factory _$_Tvg.fromJson(Map<String, dynamic> json) => _$_$_TvgFromJson(json);
 
   @override
+  @HiveField(0)
   final String id;
   @override
+  @HiveField(1)
   final String name;
   @override
+  @HiveField(2)
   final String url;
 
   @override
@@ -586,15 +633,21 @@ class _$_Tvg implements _Tvg {
 }
 
 abstract class _Tvg implements Tvg {
-  const factory _Tvg({String id, String name, String url}) = _$_Tvg;
+  const factory _Tvg(
+      {@HiveField(0) String id,
+      @HiveField(1) String name,
+      @HiveField(2) String url}) = _$_Tvg;
 
   factory _Tvg.fromJson(Map<String, dynamic> json) = _$_Tvg.fromJson;
 
   @override
+  @HiveField(0)
   String get id;
   @override
+  @HiveField(1)
   String get name;
   @override
+  @HiveField(2)
   String get url;
   @override
   _$TvgCopyWith<_Tvg> get copyWith;

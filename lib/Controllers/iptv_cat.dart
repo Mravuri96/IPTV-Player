@@ -48,11 +48,14 @@ final countryData = $_autoDisposeFamily<List<IPTVCATMODEL>, String>(
             channel,
           ),
         ),
-  ).filter((item) => item.status == 'online').toHashSet().toList()
-    ..mergeSort(
-      comparator: (a, b) => a.channel.compareTo(b.channel),
-    )
-    ..distinctBy(
-      (channel) => channel.channel,
-    ),
+  )
+      .filter((item) => item.status == 'online' && item.link.contains('.m3u8'))
+      .toHashSet()
+      .toList()
+        ..mergeSort(
+          comparator: (a, b) => a.channel.compareTo(b.channel),
+        )
+        ..distinctBy(
+          (channel) => channel.channel,
+        ),
 );

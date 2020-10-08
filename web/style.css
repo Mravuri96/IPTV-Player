@@ -3,6 +3,7 @@ body {
   place-items: center;
   background-color: #303030;
 }
+
 .sk-cube-grid {
   align-self: center;
   width: 8rem;

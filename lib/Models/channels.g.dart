@@ -3,6 +3,139 @@
 part of 'channels.dart';
 
 // **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class ChannelsAdapter extends TypeAdapter<_$_Channels> {
+  @override
+  final int typeId = 2;
+
+  @override
+  _$_Channels read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return _$_Channels(
+      name: fields[0] as String,
+      logo: fields[1] as String,
+      url: fields[2] as String,
+      category: fields[3] as String,
+      language: (fields[4] as List)?.cast<Country>(),
+      country: fields[5] as Country,
+      tvg: fields[6] as Tvg,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, _$_Channels obj) {
+    writer
+      ..writeByte(7)
+      ..writeByte(0)
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.logo)
+      ..writeByte(2)
+      ..write(obj.url)
+      ..writeByte(3)
+      ..write(obj.category)
+      ..writeByte(4)
+      ..write(obj.language)
+      ..writeByte(5)
+      ..write(obj.country)
+      ..writeByte(6)
+      ..write(obj.tvg);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChannelsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class CountryAdapter extends TypeAdapter<_$_Country> {
+  @override
+  final int typeId = 3;
+
+  @override
+  _$_Country read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return _$_Country(
+      code: fields[0] as String,
+      name: fields[1] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, _$_Country obj) {
+    writer
+      ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.code)
+      ..writeByte(1)
+      ..write(obj.name);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CountryAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class TvgAdapter extends TypeAdapter<_$_Tvg> {
+  @override
+  final int typeId = 4;
+
+  @override
+  _$_Tvg read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return _$_Tvg(
+      id: fields[0] as String,
+      name: fields[1] as String,
+      url: fields[2] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, _$_Tvg obj) {
+    writer
+      ..writeByte(3)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.url);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TvgAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

@@ -11,66 +11,11 @@ import 'package:flutter/foundation.dart'
         Key,
         StringProperty,
         required;
-import 'package:flutter/material.dart'
-    show
-        AlertDialog,
-        AnimatedSwitcher,
-        AppBar,
-        AspectRatio,
-        AutovalidateMode,
-        Axis,
-        BoxFit,
-        BuildContext,
-        Card,
-        Center,
-        CircularProgressIndicator,
-        Color,
-        Colors,
-        CustomScrollView,
-        EdgeInsets,
-        ElevatedButton,
-        Expanded,
-        FlatButton,
-        Flex,
-        FloatingActionButton,
-        FutureBuilder,
-        GridTileBar,
-        GridView,
-        Icon,
-        Icons,
-        Image,
-        InputBorder,
-        InputDecoration,
-        Key,
-        MainAxisAlignment,
-        MediaQuery,
-        OutlinedButton,
-        RotatedBox,
-        Row,
-        Scaffold,
-        Size,
-        SizedBox,
-        SliverAppBar,
-        SliverChildBuilderDelegate,
-        SliverGrid,
-        SliverGridDelegateWithMaxCrossAxisExtent,
-        SliverPadding,
-        State,
-        Text,
-        TextField,
-        TextFormField,
-        TextInputType,
-        TextOverflow,
-        TextStyle,
-        ThemeMode,
-        ToolbarOptions,
-        Tooltip,
-        Widget,
-        WidgetsFlutterBinding,
-        required,
-        runApp;
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/route_manager.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart' show Logger;
 import 'package:url_launcher/url_launcher.dart' show canLaunch, launch;
@@ -81,19 +26,46 @@ import 'Controllers/catalog_provider.dart' show catalog;
 import 'Controllers/geoip.dart' show GetIp;
 import 'Controllers/iptv_cat.dart' show countryData;
 import 'Controllers/iptv_org.dart' show ipTvOrgCatalog;
+import 'Models/channels.dart';
+import 'Models/favorite.dart';
+import 'Models/iptvcat_model.dart';
 import 'Theme/theme.dart' show dartkTheme;
 import 'Util/countires.dart' show countries;
 import 'Util/util.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  return runZonedGuarded(
-    () => runApp(
-      const ProviderScope(
-        child: Root(),
+  await Hive.initFlutter().whenComplete(
+    () async {
+      Hive
+        ..registerAdapter(
+          FavoriteAdapter(),
+        )
+        ..registerAdapter(
+          ChannelsAdapter(),
+        )
+        ..registerAdapter(
+          CountryAdapter(),
+        )
+        ..registerAdapter(
+          TvgAdapter(),
+        )
+        ..registerAdapter(
+          IPTVCATMODELAdapter(),
+        );
+      await Hive.openBox<Favorite>(
+        'Favorite',
+      );
+    },
+  ).whenComplete(
+    () async => runZonedGuarded(
+      () async => runApp(
+        const ProviderScope(
+          child: Root(),
+        ),
       ),
+      (err, stk) => Logger().e('$err $stk'),
     ),
-    (err, stk) => Logger().e('$err $stk'),
   );
 }
 
@@ -254,6 +226,17 @@ class SideBar extends HookWidget {
             direction: isMobile ? Axis.horizontal : Axis.vertical,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
+              Tooltip(
+                message: 'Favorites',
+                child: OutlinedButton(
+                  onPressed: () async =>
+                      Get.to(const FavoriteView(), preventDuplicates: true),
+                  child: const Icon(
+                    Icons.favorite,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
               Expanded(
                 child: FlatButton(
                   onPressed: () async => context.read(catalog).state = 0,
@@ -370,28 +353,30 @@ class IptvCatChannels extends HookWidget {
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (_, index) {
-                final _country = _countryList.elementAt(index);
-                return ElevatedButton(
-                  onPressed: () async => Get.to<IpTvCatCountryChannelGrid>(
-                    IpTvCatCountryChannelGrid(countryName: _country.first),
-                    preventDuplicates: true,
-                  ),
-                  child: GridTileBar(
-                    leading: Text(
-                      _country.last.toUpperCase().toFlagEmoji(),
-                      textScaleFactor: 3,
+            delegate: SliverChildListDelegate(
+              _countryList
+                  .map(
+                    (_country) => ElevatedButton(
+                      onPressed: () async => Get.to<IpTvCatCountryChannelGrid>(
+                        IpTvCatCountryChannelGrid(countryName: _country.first),
+                        preventDuplicates: true,
+                      ),
+                      child: GridTileBar(
+                        leading: Text(
+                          _country.last.toUpperCase().toFlagEmoji(),
+                          textScaleFactor: 3,
+                        ),
+                        title: Text(
+                          _country.first.toUpperCase(),
+                          maxLines: 2,
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
-                    title: Text(
-                      _country.first.toUpperCase(),
-                      maxLines: 2,
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
-                );
-              },
-              childCount: _countryList.length,
+                  )
+                  .toList(),
+              addRepaintBoundaries: false,
+              // childCount: _countryList.length,
             ),
           ),
         ),
@@ -505,6 +490,19 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                       preventDuplicates: true,
                     ),
                     child: GridTileBar(
+                      leading: IconButton(
+                        tooltip: 'Add ${_channel.channel} to favorites',
+                        icon: const Icon(Icons.favorite, color: Colors.red),
+                        onPressed: () async => Hive.box<Favorite>('Favorite')
+                            .put(
+                              _channel.channel,
+                              Favorite(iptvCat: _channel),
+                            )
+                            .whenComplete(() async => Scaffold.of(context)
+                                .showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Added ${_channel.channel} to Favorites')))),
+                      ),
                       title: Text(
                         _channel.channel,
                         overflow: TextOverflow.ellipsis,
@@ -624,9 +622,26 @@ class IptvOrgChannels extends HookWidget {
                           preventDuplicates: true,
                         ),
                         child: GridTileBar(
-                          leading: Text(
-                            _channel.country.code.toUpperCase().toFlagEmoji(),
-                            textScaleFactor: 2,
+                          leading: IconButton(
+                            icon: const Icon(Icons.favorite, color: Colors.red),
+                            onPressed: () async =>
+                                Hive.box<Favorite>('Favorite')
+                                    .put(
+                                      _channel.url,
+                                      Favorite(
+                                        iptvOrg: _channel,
+                                      ),
+                                    )
+                                    .whenComplete(
+                                      () async =>
+                                          Scaffold.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Added ${_channel.name} to Favorites',
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                           ),
                           trailing: Image.network(
                             _channel?.logo ?? 'https://via.placeholder.com/100',
@@ -638,7 +653,7 @@ class IptvOrgChannels extends HookWidget {
                             style: const TextStyle(color: Colors.black),
                           ),
                           subtitle: Text(
-                            _channel.country.name.toUpperCase(),
+                            '${_channel.country.code.toUpperCase().toFlagEmoji()} ${_channel.country.name.toUpperCase()}',
                             maxLines: 2,
                             style: const TextStyle(color: Colors.black),
                           ),
@@ -671,7 +686,7 @@ class TvPlayer extends StatefulHookWidget {
   final String url;
 
   @override
-  _VideoPlayerState createState() => _VideoPlayerState();
+  _TvPlayerState createState() => _TvPlayerState();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -682,13 +697,15 @@ class TvPlayer extends StatefulHookWidget {
   }
 }
 
-class _VideoPlayerState extends State<TvPlayer> {
-  static VideoPlayerController _controller;
+class _TvPlayerState extends State<TvPlayer> {
+  VideoPlayerController _controller;
 
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
+    _controller
+      ..pause()
+      ..dispose();
   }
 
   @override
@@ -698,11 +715,13 @@ class _VideoPlayerState extends State<TvPlayer> {
       widget.catalog == 0
           ? widget.url.substring(0, widget.url.length - 22)
           : widget.url,
-    )..initialize().then((_) => setState(() {}));
+    )
+      ..initialize().then((_) => setState(() {}))
+      ..play();
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Scaffold build(BuildContext context) => Scaffold(
         appBar: AppBar(),
         body: Center(
           child: _controller.value.initialized
@@ -712,7 +731,7 @@ class _VideoPlayerState extends State<TvPlayer> {
                     _controller,
                   ),
                 )
-              : const SizedBox(),
+              : const CircularProgressIndicator(),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => setState(() => _controller.value.isPlaying
@@ -723,4 +742,174 @@ class _VideoPlayerState extends State<TvPlayer> {
           ),
         ),
       );
+}
+
+class FavoriteView extends HookWidget {
+  const FavoriteView({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Favorites'),
+        actions: [
+          IconButton(
+            tooltip: 'Clear all favorites',
+            icon: const Icon(Icons.clear_all),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text(
+                  'Warning',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                content: const Text(
+                  'This will remove all channels from favorites.\nThis action is irreversable.',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                actions: <Widget>[
+                  RaisedButton(
+                    color: Theme.of(context).cardColor,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Cancel',
+                    ),
+                  ),
+                  RaisedButton(
+                    color: Theme.of(context).cardColor,
+                    onPressed: () async {
+                      await Hive.box<Favorite>('Favorite').clear();
+                      // await _bannerAd?.dispose();
+                      // _bannerAd = null;
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Confirm',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Center(
+        child: ValueListenableBuilder(
+          valueListenable: Hive.box<Favorite>('Favorite').listenable(),
+          builder: (context, Box<Favorite> box, _) {
+            if (box.isEmpty) {
+              return const Text(
+                'No Favorites have been added',
+              );
+            } else {
+              return CustomScrollView(slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: SliverGrid(
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 400,
+                      childAspectRatio: 3 / 1,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (_, index) {
+                        final _data = box.getAt(index);
+
+                        if (_data.iptvCat != null) {
+                          final _channel = _data.iptvCat;
+                          return ElevatedButton(
+                            onPressed: () async => Get.to(
+                              TvPlayer(
+                                url: _channel.link,
+                                catalog: 0,
+                              ),
+                              preventDuplicates: true,
+                            ),
+                            child: GridTileBar(
+                              leading: IconButton(
+                                tooltip:
+                                    'Remove ${_channel.channel} from Favorites',
+                                icon: const Icon(Icons.delete_forever),
+                                onPressed: () async => box.deleteAt(index),
+                              ),
+                              title: Text(
+                                _channel.channel,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.black),
+                                maxLines: 2,
+                              ),
+                              subtitle: Text(
+                                '${int.parse(
+                                      _channel.mbps.removeSuffix(', ...'),
+                                    ) / 1000} mpbs',
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              trailing: _channel.format == 'hd'
+                                  ? const Icon(
+                                      Icons.hd,
+                                      color: Colors.black,
+                                    )
+                                  : const Icon(
+                                      Icons.fiber_dvr,
+                                      color: Colors.black,
+                                    ),
+                            ),
+                          );
+                        } else if (_data.iptvOrg != null) {
+                          final _channel = _data.iptvOrg;
+                          return ElevatedButton(
+                            onPressed: () async => Get.to(
+                              TvPlayer(
+                                url: _channel.url,
+                                catalog: 1,
+                              ),
+                              preventDuplicates: true,
+                            ),
+                            child: GridTileBar(
+                              leading: IconButton(
+                                tooltip:
+                                    'Remove ${_channel.name} from Favorites',
+                                icon: const Icon(Icons.delete_forever),
+                                onPressed: () async => box.deleteAt(index),
+                              ),
+                              trailing: Image.network(
+                                _channel?.logo ??
+                                    'https://via.placeholder.com/100',
+                                width: 100,
+                                fit: BoxFit.scaleDown,
+                              ),
+                              title: Text(
+                                _channel.name,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              subtitle: Text(
+                                '${_channel.country.code.toUpperCase().toFlagEmoji()} ${_channel.country.name.toUpperCase()}',
+                                maxLines: 2,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      },
+                      childCount: box.length,
+                    ),
+                  ),
+                ),
+              ]);
+            }
+          },
+        ),
+      ),
+    );
+  }
 }

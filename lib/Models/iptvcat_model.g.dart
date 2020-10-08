@@ -3,6 +3,71 @@
 part of 'iptvcat_model.dart';
 
 // **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class IPTVCATMODELAdapter extends TypeAdapter<_$_IPTVCATMODEL> {
+  @override
+  final int typeId = 1;
+
+  @override
+  _$_IPTVCATMODEL read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return _$_IPTVCATMODEL(
+      id: fields[0] as String,
+      channel: fields[1] as String,
+      link: fields[2] as String,
+      country: fields[3] as String,
+      liveliness: fields[4] as String,
+      status: fields[5] as String,
+      lastChecked: fields[6] as DateTime,
+      format: fields[7] as String,
+      mbps: fields[8] as String,
+      uri: (fields[9] as List)?.cast<String>(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, _$_IPTVCATMODEL obj) {
+    writer
+      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.channel)
+      ..writeByte(2)
+      ..write(obj.link)
+      ..writeByte(3)
+      ..write(obj.country)
+      ..writeByte(4)
+      ..write(obj.liveliness)
+      ..writeByte(5)
+      ..write(obj.status)
+      ..writeByte(6)
+      ..write(obj.lastChecked)
+      ..writeByte(7)
+      ..write(obj.format)
+      ..writeByte(8)
+      ..write(obj.mbps)
+      ..writeByte(9)
+      ..write(obj.uri);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is IPTVCATMODELAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

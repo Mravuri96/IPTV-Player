@@ -7,13 +7,6 @@ flutter packages upgrade
 
 derry build
 
-flutter build web --null-assertions --release --csp --tree-shake-icons
+flutter build web --no-source-maps  --null-assertions --release --csp --pwa-strategy none
 
-open ./build/web
-
-cd build/web
-git init                                                 
-git add . -v
-git commit -am "📺"
-git remote add origin https://github.com/Mravuri96/IPTV-Player.git
-git push -u origin master --force
+firebase deploy

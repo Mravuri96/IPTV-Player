@@ -17,7 +17,11 @@ final ipTvOrgCatalog = $_autoDispose<List<Channels>>(
                   x,
                 ),
               ),
-        )..mergeSort(comparator: (a, b) => a.name.compareTo(b.name)),
+        )
+            .filter((element) => element.url.contains('.m3u8'))
+            .toHashSet()
+            .toList()
+              ..mergeSort(comparator: (a, b) => a.name.compareTo(b.name)),
       )
       .whenComplete(() => ref.maintainState = true),
 );

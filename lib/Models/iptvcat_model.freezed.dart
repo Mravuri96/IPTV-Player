@@ -18,16 +18,16 @@ class _$IPTVCATMODELTearOff {
 
 // ignore: unused_element
   _IPTVCATMODEL call(
-      {String id,
-      String channel,
-      String link,
-      String country,
-      String liveliness,
-      String status,
-      DateTime lastChecked,
-      String format,
-      String mbps,
-      List<String> uri}) {
+      {@HiveField(0) String id,
+      @HiveField(1) String channel,
+      @HiveField(2) String link,
+      @HiveField(3) String country,
+      @HiveField(4) String liveliness,
+      @HiveField(5) String status,
+      @HiveField(6) DateTime lastChecked,
+      @HiveField(7) String format,
+      @HiveField(8) String mbps,
+      @HiveField(9) List<String> uri}) {
     return _IPTVCATMODEL(
       id: id,
       channel: channel,
@@ -54,15 +54,25 @@ const $IPTVCATMODEL = _$IPTVCATMODELTearOff();
 
 /// @nodoc
 mixin _$IPTVCATMODEL {
+  @HiveField(0)
   String get id;
+  @HiveField(1)
   String get channel;
+  @HiveField(2)
   String get link;
+  @HiveField(3)
   String get country;
+  @HiveField(4)
   String get liveliness;
+  @HiveField(5)
   String get status;
+  @HiveField(6)
   DateTime get lastChecked;
+  @HiveField(7)
   String get format;
+  @HiveField(8)
   String get mbps;
+  @HiveField(9)
   List<String> get uri;
 
   Map<String, dynamic> toJson();
@@ -75,16 +85,16 @@ abstract class $IPTVCATMODELCopyWith<$Res> {
           IPTVCATMODEL value, $Res Function(IPTVCATMODEL) then) =
       _$IPTVCATMODELCopyWithImpl<$Res>;
   $Res call(
-      {String id,
-      String channel,
-      String link,
-      String country,
-      String liveliness,
-      String status,
-      DateTime lastChecked,
-      String format,
-      String mbps,
-      List<String> uri});
+      {@HiveField(0) String id,
+      @HiveField(1) String channel,
+      @HiveField(2) String link,
+      @HiveField(3) String country,
+      @HiveField(4) String liveliness,
+      @HiveField(5) String status,
+      @HiveField(6) DateTime lastChecked,
+      @HiveField(7) String format,
+      @HiveField(8) String mbps,
+      @HiveField(9) List<String> uri});
 }
 
 /// @nodoc
@@ -133,16 +143,16 @@ abstract class _$IPTVCATMODELCopyWith<$Res>
       __$IPTVCATMODELCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String id,
-      String channel,
-      String link,
-      String country,
-      String liveliness,
-      String status,
-      DateTime lastChecked,
-      String format,
-      String mbps,
-      List<String> uri});
+      {@HiveField(0) String id,
+      @HiveField(1) String channel,
+      @HiveField(2) String link,
+      @HiveField(3) String country,
+      @HiveField(4) String liveliness,
+      @HiveField(5) String status,
+      @HiveField(6) DateTime lastChecked,
+      @HiveField(7) String format,
+      @HiveField(8) String mbps,
+      @HiveField(9) List<String> uri});
 }
 
 /// @nodoc
@@ -186,43 +196,54 @@ class __$IPTVCATMODELCopyWithImpl<$Res> extends _$IPTVCATMODELCopyWithImpl<$Res>
 }
 
 @JsonSerializable(explicitToJson: true)
+@HiveType(typeId: 1, adapterName: 'IPTVCATMODELAdapter')
 
 /// @nodoc
 class _$_IPTVCATMODEL implements _IPTVCATMODEL {
   const _$_IPTVCATMODEL(
-      {this.id,
-      this.channel,
-      this.link,
-      this.country,
-      this.liveliness,
-      this.status,
-      this.lastChecked,
-      this.format,
-      this.mbps,
-      this.uri});
+      {@HiveField(0) this.id,
+      @HiveField(1) this.channel,
+      @HiveField(2) this.link,
+      @HiveField(3) this.country,
+      @HiveField(4) this.liveliness,
+      @HiveField(5) this.status,
+      @HiveField(6) this.lastChecked,
+      @HiveField(7) this.format,
+      @HiveField(8) this.mbps,
+      @HiveField(9) this.uri});
 
   factory _$_IPTVCATMODEL.fromJson(Map<String, dynamic> json) =>
       _$_$_IPTVCATMODELFromJson(json);
 
   @override
+  @HiveField(0)
   final String id;
   @override
+  @HiveField(1)
   final String channel;
   @override
+  @HiveField(2)
   final String link;
   @override
+  @HiveField(3)
   final String country;
   @override
+  @HiveField(4)
   final String liveliness;
   @override
+  @HiveField(5)
   final String status;
   @override
+  @HiveField(6)
   final DateTime lastChecked;
   @override
+  @HiveField(7)
   final String format;
   @override
+  @HiveField(8)
   final String mbps;
   @override
+  @HiveField(9)
   final List<String> uri;
 
   @override
@@ -286,39 +307,49 @@ class _$_IPTVCATMODEL implements _IPTVCATMODEL {
 
 abstract class _IPTVCATMODEL implements IPTVCATMODEL {
   const factory _IPTVCATMODEL(
-      {String id,
-      String channel,
-      String link,
-      String country,
-      String liveliness,
-      String status,
-      DateTime lastChecked,
-      String format,
-      String mbps,
-      List<String> uri}) = _$_IPTVCATMODEL;
+      {@HiveField(0) String id,
+      @HiveField(1) String channel,
+      @HiveField(2) String link,
+      @HiveField(3) String country,
+      @HiveField(4) String liveliness,
+      @HiveField(5) String status,
+      @HiveField(6) DateTime lastChecked,
+      @HiveField(7) String format,
+      @HiveField(8) String mbps,
+      @HiveField(9) List<String> uri}) = _$_IPTVCATMODEL;
 
   factory _IPTVCATMODEL.fromJson(Map<String, dynamic> json) =
       _$_IPTVCATMODEL.fromJson;
 
   @override
+  @HiveField(0)
   String get id;
   @override
+  @HiveField(1)
   String get channel;
   @override
+  @HiveField(2)
   String get link;
   @override
+  @HiveField(3)
   String get country;
   @override
+  @HiveField(4)
   String get liveliness;
   @override
+  @HiveField(5)
   String get status;
   @override
+  @HiveField(6)
   DateTime get lastChecked;
   @override
+  @HiveField(7)
   String get format;
   @override
+  @HiveField(8)
   String get mbps;
   @override
+  @HiveField(9)
   List<String> get uri;
   @override
   _$IPTVCATMODELCopyWith<_IPTVCATMODEL> get copyWith;

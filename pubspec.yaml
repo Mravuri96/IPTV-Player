@@ -21,6 +21,7 @@ dependencies:
   logger:
   meta:
   intl:
+  connectivity:
   characters:
   flutter_staggered_animations:
   json_annotation:
@@ -30,12 +31,14 @@ dependencies:
   video_player_web_hls:
     git:
       url: https://github.com/Mravuri96/video_player_web_hls.git
-      ref: bfb8651a44029011ea6ba39ea92cb1299a41f0ea
+      ref: db71be8623ff29d6f5ca991fb0e98b125fb75533
   get:
   flutter_hooks:
   hooks_riverpod:
   dartx:
   url_launcher:
+  hive:
+  hive_flutter:
 
 dev_dependencies:
   flutter_test:
@@ -59,4 +62,4 @@ flutter:
     
 scripts:
   build: flutter pub run build_runner build --release --delete-conflicting-outputs
-  watch: flutter pub run build_runner watch --watch --delete-conflicting-outputs
+  watch: flutter pub run build_runner build --watch --delete-conflicting-outputs
