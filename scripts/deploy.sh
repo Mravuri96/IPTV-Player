@@ -7,6 +7,6 @@ flutter packages upgrade
 
 derry build
 
-flutter build web --no-source-maps  --null-assertions --release --csp --pwa-strategy none
+flutter build web --no-source-maps --release --csp
 
 firebase deploy

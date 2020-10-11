@@ -53,6 +53,8 @@ dev_dependencies:
   json_serializable:
   pedantic:
   effective_dart:
+  firebase_core: "^0.5.0+1"
+  firebase_analytics: "^6.0.2"
 
 flutter:
   uses-material-design: true

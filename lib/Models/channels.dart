@@ -34,7 +34,7 @@ abstract class Country with _$Country {
 }
 
 @freezed
-abstract class Tvg with _$Tvg{
+abstract class Tvg with _$Tvg {
   @HiveType(typeId: 4, adapterName: 'TvgAdapter')
   const factory Tvg({
     @HiveField(0) String id,

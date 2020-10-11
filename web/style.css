@@ -1,4 +1,5 @@
-body {
+:root {
+  scroll-behavior: smooth;
   display: grid;
   place-items: center;
   background-color: #303030;

@@ -11,6 +11,10 @@ import 'package:flutter/foundation.dart'
         Key,
         StringProperty,
         required;
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/route_manager.dart';
@@ -26,10 +30,11 @@ import 'Controllers/catalog_provider.dart' show catalog;
 import 'Controllers/geoip.dart' show GetIp;
 import 'Controllers/iptv_cat.dart' show countryData;
 import 'Controllers/iptv_org.dart' show ipTvOrgCatalog;
+import 'Controllers/placeholder_provider.dart';
 import 'Models/channels.dart';
 import 'Models/favorite.dart';
 import 'Models/iptvcat_model.dart';
-import 'Theme/theme.dart' show dartkTheme;
+import 'Theme/theme.dart' show darkTheme;
 import 'Util/countires.dart' show countries;
 import 'Util/util.dart';
 
@@ -37,6 +42,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter().whenComplete(
     () async {
+      await Firebase.initializeApp();
       Hive
         ..registerAdapter(
           FavoriteAdapter(),
@@ -71,14 +77,17 @@ Future<void> main() async {
 
 class Root extends HookWidget {
   const Root({Key key}) : super(key: key);
-
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
   @override
   Widget build(BuildContext context) => FutureBuilder<void>(
         future: Future.sync(() => GetIp().figureOut()),
         builder: (context, __) => GetMaterialApp(
           themeMode: ThemeMode.dark,
-          darkTheme: dartkTheme,
+          darkTheme: darkTheme,
           title: '📺 IPTV',
+          navigatorObservers: <NavigatorObserver>[observer],
           home: const Home(),
         ),
       );
@@ -94,45 +103,49 @@ class Home extends HookWidget {
     final _pageIndex = useProvider(catalog);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
-      child: MediaQuery.of(context).size.width > 500
-          ? Scaffold(
-              body: Row(
-                children: <Widget>[
-                  const SideBar(
-                    isMobile: false,
-                  ),
-                  Expanded(
-                    child: PageTransitionSwitcher(
-                      transitionBuilder:
-                          (child, primaryAnimation, secondaryAnimation) =>
-                              FadeThroughTransition(
-                        secondaryAnimation: secondaryAnimation,
-                        animation: primaryAnimation,
-                        child: child,
-                      ),
-                      child: _catalogs.elementAt(_pageIndex.state),
-                    ),
-                  ),
-                ],
-              ),
-              floatingActionButton: _fab,
-            )
-          : Scaffold(
-              body: PageTransitionSwitcher(
-                transitionBuilder:
-                    (child, primaryAnimation, secondaryAnimation) =>
-                        FadeThroughTransition(
-                  secondaryAnimation: secondaryAnimation,
-                  animation: primaryAnimation,
-                  child: child,
-                ),
-                child: _catalogs.elementAt(_pageIndex.state),
-              ),
-              bottomNavigationBar: const SideBar(
-                isMobile: true,
-              ),
-              floatingActionButton: _fab,
-            ),
+      child:
+          //  MediaQuery.of(context).size.width > 500
+          //     ? Scaffold(
+          //         body: Row(
+          //           children: <Widget>[
+          //             SizedBox(
+          //               width: 72,
+          //               child: const NavigationPanel(
+          //                 isMobile: false,
+          //               ),
+          //             ),
+          //             Expanded(
+          //               child: PageTransitionSwitcher(
+          //                 transitionBuilder:
+          //                     (child, primaryAnimation, secondaryAnimation) =>
+          //                         FadeThroughTransition(
+          //                   secondaryAnimation: secondaryAnimation,
+          //                   animation: primaryAnimation,
+          //                   child: child,
+          //                 ),
+          //                 child: _catalogs.elementAt(_pageIndex.state),
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //         floatingActionButton: _fab,
+          //       )
+          //     :
+          Scaffold(
+        body: PageTransitionSwitcher(
+          transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
+              FadeThroughTransition(
+            secondaryAnimation: secondaryAnimation,
+            animation: primaryAnimation,
+            child: child,
+          ),
+          child: _catalogs.elementAt(_pageIndex.state),
+        ),
+        bottomNavigationBar: const NavigationPanel(
+          isMobile: true,
+        ),
+        floatingActionButton: _fab,
+      ),
     );
   }
 
@@ -211,8 +224,8 @@ class CustomDialog extends HookWidget {
   }
 }
 
-class SideBar extends HookWidget {
-  const SideBar({
+class NavigationPanel extends HookWidget {
+  const NavigationPanel({
     @required this.isMobile,
     Key key,
   }) : super(key: key);
@@ -220,72 +233,120 @@ class SideBar extends HookWidget {
   final bool isMobile;
 
   @override
-  Widget build(BuildContext context) => SizedBox.fromSize(
-        size: isMobile ? const Size.fromHeight(52) : const Size.fromWidth(72),
-        child: Flex(
-            direction: isMobile ? Axis.horizontal : Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Tooltip(
-                message: 'Favorites',
-                child: OutlinedButton(
-                  onPressed: () async =>
-                      Get.to(const FavoriteView(), preventDuplicates: true),
-                  child: const Icon(
-                    Icons.favorite,
-                    color: Colors.red,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: FlatButton(
-                  onPressed: () async => context.read(catalog).state = 0,
-                  child: RotatedBox(
-                    quarterTurns: isMobile ? 0 : 3,
-                    child: const Text(
-                      'IPTV-CAT',
-                      style: TextStyle(
-                        color: Color(
-                          0xffFCCFA8,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: FlatButton(
-                  onPressed: () async => context.read(catalog).state = 1,
-                  child: RotatedBox(
-                    quarterTurns: isMobile ? 0 : 3,
-                    child: const Text(
-                      'IPTV-ORG',
-                      style: TextStyle(
-                        color: Color(
-                          0xffFCCFA8,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Tooltip(
-                message: 'Report an issue with the website.',
-                child: OutlinedButton(
-                  onPressed: () async {
-                    const url =
-                        'https://github.com/Mravuri96/IPTV-Player/issues';
-                    if (await canLaunch(url)) {
-                      await launch(url);
-                    } else {
-                      return Logger().e('Couldnt launch $url');
-                    }
-                  },
-                  child: const Icon(Icons.bug_report),
-                ),
-              ),
-            ]),
-      );
+  Widget build(BuildContext context) {
+    final _index = useState(2);
+    return BottomNavigationBar(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite, color: Colors.red),
+          label: 'Favorite',
+        ),
+        BottomNavigationBarItem(
+          icon: SizedBox(),
+          label: 'IPTV-CAT',
+        ),
+        BottomNavigationBarItem(
+          icon: SizedBox(),
+          label: 'IPTV-ORG',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bug_report),
+          label: 'Bugs',
+        ),
+      ],
+      currentIndex: _index.value,
+      onTap: (index) async {
+        if (index == 0) {
+          _index.value = index;
+          await Get.to(const FavoriteView(), preventDuplicates: true);
+        } else if (index == 1) {
+          _index.value = index;
+
+          context.read(catalog).state = 0;
+        } else if (index == 2) {
+          _index.value = index;
+
+          context.read(catalog).state = 1;
+        } else if (index == 3) {
+          _index.value = index;
+
+          const url = 'https://github.com/Mravuri96/IPTV-Player/issues';
+          if (await canLaunch(url)) {
+            await launch(url);
+          } else {
+            return Logger().e('Couldnt launch $url');
+          }
+        }
+      },
+    );
+  }
+
+  // SizedBox.fromSize(
+  //       size: isMobile ? const Size.fromHeight(52) : const Size.fromWidth(72),
+  //       child: Flex(
+  //           direction: isMobile ? Axis.horizontal : Axis.vertical,
+  //           mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //           children: [
+  //             Tooltip(
+  //               message: 'Favorites',
+  //               child: OutlinedButton(
+  //                 onPressed: () async =>
+  //                     Get.to(const FavoriteView(), preventDuplicates: true),
+  //                 child: const Icon(
+  //                   Icons.favorite,
+  //                   color: Colors.red,
+  //                 ),
+  //               ),
+  //             ),
+  //             Expanded(
+  //               child: FlatButton(
+  //                 onPressed: () async => context.read(catalog).state = 0,
+  //                 child: RotatedBox(
+  //                   quarterTurns: isMobile ? 0 : 3,
+  //                   child: const Text(
+  //                     'IPTV-CAT',
+  //                     style: TextStyle(
+  //                       color: Color(
+  //                         0xffFCCFA8,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             Expanded(
+  //               child: FlatButton(
+  //                 onPressed: () async => context.read(catalog).state = 1,
+  //                 child: RotatedBox(
+  //                   quarterTurns: isMobile ? 0 : 3,
+  //                   child: const Text(
+  //                     'IPTV-ORG',
+  //                     style: TextStyle(
+  //                       color: Color(
+  //                         0xffFCCFA8,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             Tooltip(
+  //               message: 'Report an issue with the website.',
+  //               child: OutlinedButton(
+  //                 onPressed: () async {
+  // const url =
+  //     'https://github.com/Mravuri96/IPTV-Player/issues';
+  // if (await canLaunch(url)) {
+  //   await launch(url);
+  // } else {
+  //   return Logger().e('Couldnt launch $url');
+  // }
+  //                 },
+  //                 child: const Icon(Icons.bug_report),
+  //               ),
+  //             ),
+  //           ]),
+  //     );
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -302,13 +363,34 @@ class IptvCatChannels extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final _country = useState('');
-    final _countryList = useProvider(countries).filter(
-      (element) =>
-          element.last.contains(_country.value.toLowerCase()) ||
-          element.first.contains(
-            _country.value.toLowerCase(),
+    final _countryList = useProvider(countries)
+        .where(
+          (element) =>
+              element.last.contains(_country.value.toLowerCase()) ||
+              element.first.contains(
+                _country.value.toLowerCase(),
+              ),
+        )
+        .map(
+          (_country) => ElevatedButton(
+            onPressed: () async => Get.to<IpTvCatCountryChannelGrid>(
+              IpTvCatCountryChannelGrid(countryName: _country.first),
+              preventDuplicates: true,
+            ),
+            child: GridTileBar(
+              leading: Text(
+                _country.last.toUpperCase().toFlagEmoji(),
+                textScaleFactor: 3,
+              ),
+              title: Text(
+                _country.first.toUpperCase(),
+                maxLines: 2,
+                style: const TextStyle(color: Colors.black),
+              ),
+            ),
           ),
-    );
+        )
+        .toList();
 
     return CustomScrollView(
       slivers: <Widget>[
@@ -354,29 +436,7 @@ class IptvCatChannels extends HookWidget {
               mainAxisSpacing: 8,
             ),
             delegate: SliverChildListDelegate(
-              _countryList
-                  .map(
-                    (_country) => ElevatedButton(
-                      onPressed: () async => Get.to<IpTvCatCountryChannelGrid>(
-                        IpTvCatCountryChannelGrid(countryName: _country.first),
-                        preventDuplicates: true,
-                      ),
-                      child: GridTileBar(
-                        leading: Text(
-                          _country.last.toUpperCase().toFlagEmoji(),
-                          textScaleFactor: 3,
-                        ),
-                        title: Text(
-                          _country.first.toUpperCase(),
-                          maxLines: 2,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-              addRepaintBoundaries: false,
-              // childCount: _countryList.length,
+              _countryList,
             ),
           ),
         ),
@@ -473,6 +533,7 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                 padding: const EdgeInsets.all(16),
                 itemCount: _channelList.length,
                 shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 400,
                   childAspectRatio: 3 / 1,
@@ -643,8 +704,10 @@ class IptvOrgChannels extends HookWidget {
                                       ),
                                     ),
                           ),
-                          trailing: Image.network(
-                            _channel?.logo ?? 'https://via.placeholder.com/100',
+                          trailing: FadeInImage.memoryNetwork(
+                            image: _channel?.logo ??
+                                'https://via.placeholder.com/100',
+                            placeholder: context.read(placeholderImage),
                             width: 100,
                             fit: BoxFit.scaleDown,
                           ),
@@ -880,9 +943,10 @@ class FavoriteView extends HookWidget {
                                 icon: const Icon(Icons.delete_forever),
                                 onPressed: () async => box.deleteAt(index),
                               ),
-                              trailing: Image.network(
-                                _channel?.logo ??
+                              trailing: FadeInImage.memoryNetwork(
+                                image: _channel?.logo ??
                                     'https://via.placeholder.com/100',
+                                placeholder: context.read(placeholderImage),
                                 width: 100,
                                 fit: BoxFit.scaleDown,
                               ),
