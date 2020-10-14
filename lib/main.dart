@@ -109,7 +109,7 @@ class Home extends HookWidget {
           //         body: Row(
           //           children: <Widget>[
           //             SizedBox(
-          //               width: 72,
+          //               width: 56,
           //               child: const NavigationPanel(
           //                 isMobile: false,
           //               ),
@@ -281,73 +281,6 @@ class NavigationPanel extends HookWidget {
     );
   }
 
-  // SizedBox.fromSize(
-  //       size: isMobile ? const Size.fromHeight(52) : const Size.fromWidth(72),
-  //       child: Flex(
-  //           direction: isMobile ? Axis.horizontal : Axis.vertical,
-  //           mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //           children: [
-  //             Tooltip(
-  //               message: 'Favorites',
-  //               child: OutlinedButton(
-  //                 onPressed: () async =>
-  //                     Get.to(const FavoriteView(), preventDuplicates: true),
-  //                 child: const Icon(
-  //                   Icons.favorite,
-  //                   color: Colors.red,
-  //                 ),
-  //               ),
-  //             ),
-  //             Expanded(
-  //               child: FlatButton(
-  //                 onPressed: () async => context.read(catalog).state = 0,
-  //                 child: RotatedBox(
-  //                   quarterTurns: isMobile ? 0 : 3,
-  //                   child: const Text(
-  //                     'IPTV-CAT',
-  //                     style: TextStyle(
-  //                       color: Color(
-  //                         0xffFCCFA8,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //             Expanded(
-  //               child: FlatButton(
-  //                 onPressed: () async => context.read(catalog).state = 1,
-  //                 child: RotatedBox(
-  //                   quarterTurns: isMobile ? 0 : 3,
-  //                   child: const Text(
-  //                     'IPTV-ORG',
-  //                     style: TextStyle(
-  //                       color: Color(
-  //                         0xffFCCFA8,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //             Tooltip(
-  //               message: 'Report an issue with the website.',
-  //               child: OutlinedButton(
-  //                 onPressed: () async {
-  // const url =
-  //     'https://github.com/Mravuri96/IPTV-Player/issues';
-  // if (await canLaunch(url)) {
-  //   await launch(url);
-  // } else {
-  //   return Logger().e('Couldnt launch $url');
-  // }
-  //                 },
-  //                 child: const Icon(Icons.bug_report),
-  //               ),
-  //             ),
-  //           ]),
-  //     );
-
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
@@ -400,7 +333,6 @@ class IptvCatChannels extends HookWidget {
             backgroundColor: const Color(0xffFCCFA8),
             floating: true,
             snap: true,
-            toolbarHeight: 72,
             title: TextField(
               decoration: const InputDecoration(
                 enabledBorder: InputBorder.none,
@@ -432,8 +364,8 @@ class IptvCatChannels extends HookWidget {
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 400,
               childAspectRatio: 3 / 1,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
             ),
             delegate: SliverChildListDelegate(
               _countryList,
@@ -537,8 +469,8 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 400,
                   childAspectRatio: 3 / 1,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
                 ),
                 itemBuilder: (context, index) {
                   final _channel = _channelList.elementAt(index);
@@ -636,7 +568,6 @@ class IptvOrgChannels extends HookWidget {
                   backgroundColor: const Color(0xffFCCFA8),
                   floating: true,
                   snap: true,
-                  toolbarHeight: 72,
                   title: TextField(
                     decoration: const InputDecoration(
                       enabledBorder: InputBorder.none,
@@ -668,8 +599,8 @@ class IptvOrgChannels extends HookWidget {
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 400,
                     childAspectRatio: 3 / 1,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (_, index) {
@@ -879,8 +810,8 @@ class FavoriteView extends HookWidget {
                         const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 400,
                       childAspectRatio: 3 / 1,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (_, index) {

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart' show ChangeNotifier, kDebugMode;
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:logger/logger.dart' show Level, Logger;
 
-import '../IPResponse/ip_response.dart' show IpResponse;
+import '../models/IPResponse/ip_response.dart' show IpResponse;
 
 class GetIp extends ChangeNotifier {
   IpResponse _ipResponse;

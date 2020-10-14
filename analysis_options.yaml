@@ -1,4 +1,4 @@
-include: linter_rules.yaml
+include: ./linter_rules.yaml
 
 analyzer:
   exclude: [lib/*/*.g.dart, lib/*/*.freezed.dart, ]

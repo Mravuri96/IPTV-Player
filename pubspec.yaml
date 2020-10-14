@@ -60,7 +60,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/streams.zip
-    - assets/channels.json
+    - assets/channels.zip
     
 scripts:
   build: flutter pub run build_runner build --release --delete-conflicting-outputs
