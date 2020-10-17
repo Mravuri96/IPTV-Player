@@ -101,24 +101,6 @@ class Home extends HookWidget {
     IptvOrgChannels()
   ];
 
-  FloatingActionButton get _fab => FloatingActionButton.extended(
-        backgroundColor: const Color.fromARGB(255, 30, 30, 30),
-        label: const Text(
-          'Custom url',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        icon: const Icon(
-          Icons.edit,
-          color: Color(0xffFCCFA8),
-        ),
-        onPressed: () async => Get.dialog(
-          const CustomDialog(),
-          useRootNavigator: false,
-        ),
-      );
-
   @override
   Widget build(BuildContext context) {
     final _pageIndex = useProvider(catalog);
@@ -141,6 +123,24 @@ class Home extends HookWidget {
       ),
     );
   }
+
+  FloatingActionButton get _fab => FloatingActionButton.extended(
+        backgroundColor: const Color.fromARGB(255, 30, 30, 30),
+        label: const Text(
+          'Custom url',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        icon: const Icon(
+          Icons.edit,
+          color: Color(0xffFCCFA8),
+        ),
+        onPressed: () async => Get.dialog(
+          const CustomDialog(),
+          useRootNavigator: false,
+        ),
+      );
 }
 
 class CustomDialog extends HookWidget {
@@ -207,14 +207,6 @@ class NavigationPanel extends HookWidget {
   final bool isMobile;
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(
-      DiagnosticsProperty<bool>('isMobile', isMobile),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     final _index = useState(2);
     return BottomNavigationBar(
@@ -263,6 +255,14 @@ class NavigationPanel extends HookWidget {
           }
         }
       },
+    );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(
+      DiagnosticsProperty<bool>('isMobile', isMobile),
     );
   }
 }
@@ -357,17 +357,7 @@ class IptvCatChannels extends HookWidget {
 class IpTvCatCountryChannelGrid extends HookWidget {
   const IpTvCatCountryChannelGrid({this.countryName, Key key})
       : super(key: key);
-
   final String countryName;
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(
-      StringProperty('countryName', countryName),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final _channel = useState('');
@@ -511,6 +501,14 @@ class IpTvCatCountryChannelGrid extends HookWidget {
           );
         }
       },
+    );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(
+      StringProperty('countryName', countryName),
     );
   }
 }
@@ -665,24 +663,6 @@ class TvPlayer extends StatefulHookWidget {
 }
 
 class _TvPlayerState extends State<TvPlayer> {
-                          child: const Text('  Click Here  '),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => setState(() => _controller.value.isPlaying
-              ? _controller.pause()
-              : _controller.play()),
-          child: Icon(
-            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-          ),
-        ),
-      );
-
-
   VideoPlayerController _controller;
 
   @override
@@ -740,6 +720,22 @@ class _TvPlayerState extends State<TvPlayer> {
                               return Logger().e('Couldnt launch $url');
                             }
                           },
+                          child: const Text('  Click Here  '),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => setState(() => _controller.value.isPlaying
+              ? _controller.pause()
+              : _controller.play()),
+          child: Icon(
+            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          ),
+        ),
+      );
 }
 
 class FavoriteView extends HookWidget {
