@@ -182,7 +182,7 @@ packages:
       name: connectivity
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.9+3"
+    version: "0.4.9+5"
   connectivity_for_web:
     dependency: transitive
     description:
@@ -315,7 +315,7 @@ packages:
       name: firebase
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "7.3.1"
+    version: "7.3.2"
   firebase_analytics:
     dependency: "direct dev"
     description:
@@ -383,7 +383,7 @@ packages:
       name: flutter_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.11.1"
+    version: "0.11.2"
   flutter_staggered_animations:
     dependency: "direct main"
     description:
@@ -463,7 +463,7 @@ packages:
       name: hooks_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.11.1"
+    version: "0.11.2"
   http:
     dependency: transitive
     description:
@@ -603,7 +603,7 @@ packages:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.18"
+    version: "1.6.21"
   path_provider_linux:
     dependency: transitive
     description:
@@ -715,7 +715,7 @@ packages:
       name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.11.0"
+    version: "0.11.2"
   scratch_space:
     dependency: transitive
     description:
@@ -790,7 +790,7 @@ packages:
       name: stack_trace
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.10.0-nullsafety.2"
+    version: "1.10.0-nullsafety.4"
   state_notifier:
     dependency: transitive
     description:
@@ -881,7 +881,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.7.2"
+    version: "5.7.5"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -930,7 +930,7 @@ packages:
       name: video_player
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.11.0"
+    version: "0.11.1+2"
   video_player_platform_interface:
     dependency: transitive
     description:
@@ -1004,5 +1004,5 @@ packages:
     source: hosted
     version: "2.2.1"
 sdks:
-  dart: ">=2.10.0 <=2.11.0-217.0.dev"
+  dart: ">=2.10.0 <=2.11.0-228.0.dev"
   flutter: ">=1.20.0 <2.0.0"

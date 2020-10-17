@@ -11,8 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons:
   animations:
+  cupertino_icons:
   dio:
   dio_cookie_manager:
   dio_http2_adapter:

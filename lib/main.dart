@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart'
     show
         DiagnosticPropertiesBuilder,
         DiagnosticsProperty,
-        IntProperty,
         Key,
         StringProperty,
         required;
@@ -30,10 +29,10 @@ import 'Controllers/catalog_provider.dart' show catalog;
 import 'Controllers/geoip.dart' show GetIp;
 import 'Controllers/iptv_cat.dart' show countryData;
 import 'Controllers/iptv_org.dart' show ipTvOrgCatalog;
-import 'Controllers/placeholder_provider.dart';
-import 'Models/channels.dart';
-import 'Models/favorite.dart';
-import 'Models/iptvcat_model.dart';
+import 'Controllers/placeholder_provider.dart' show placeholderImage;
+import 'Models/channels.dart' show ChannelsAdapter, CountryAdapter, TvgAdapter;
+import 'Models/favorite.dart' show Favorite, FavoriteAdapter;
+import 'Models/iptvcat_model.dart' show IPTVCATMODELAdapter;
 import 'Theme/theme.dart' show darkTheme;
 import 'Util/countires.dart' show countries;
 import 'Util/util.dart';
@@ -96,42 +95,36 @@ class Root extends HookWidget {
 class Home extends HookWidget {
   const Home({Key key}) : super(key: key);
 
-  static const _catalogs = [IptvCatChannels(), IptvOrgChannels()];
+  static const _catalogs = [
+    FavoriteView(),
+    IptvCatChannels(),
+    IptvOrgChannels()
+  ];
+
+  FloatingActionButton get _fab => FloatingActionButton.extended(
+        backgroundColor: const Color.fromARGB(255, 30, 30, 30),
+        label: const Text(
+          'Custom url',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        icon: const Icon(
+          Icons.edit,
+          color: Color(0xffFCCFA8),
+        ),
+        onPressed: () async => Get.dialog(
+          const CustomDialog(),
+          useRootNavigator: false,
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
     final _pageIndex = useProvider(catalog);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
-      child:
-          //  MediaQuery.of(context).size.width > 500
-          //     ? Scaffold(
-          //         body: Row(
-          //           children: <Widget>[
-          //             SizedBox(
-          //               width: 56,
-          //               child: const NavigationPanel(
-          //                 isMobile: false,
-          //               ),
-          //             ),
-          //             Expanded(
-          //               child: PageTransitionSwitcher(
-          //                 transitionBuilder:
-          //                     (child, primaryAnimation, secondaryAnimation) =>
-          //                         FadeThroughTransition(
-          //                   secondaryAnimation: secondaryAnimation,
-          //                   animation: primaryAnimation,
-          //                   child: child,
-          //                 ),
-          //                 child: _catalogs.elementAt(_pageIndex.state),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //         floatingActionButton: _fab,
-          //       )
-          //     :
-          Scaffold(
+      child: Scaffold(
         body: PageTransitionSwitcher(
           transitionBuilder: (child, primaryAnimation, secondaryAnimation) =>
               FadeThroughTransition(
@@ -148,24 +141,6 @@ class Home extends HookWidget {
       ),
     );
   }
-
-  FloatingActionButton get _fab => FloatingActionButton.extended(
-        backgroundColor: const Color.fromARGB(255, 48, 48, 48),
-        label: const Text(
-          'Custom url',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        icon: const Icon(
-          Icons.edit,
-          color: Color(0xffFCCFA8),
-        ),
-        onPressed: () async => Get.dialog(
-          const CustomDialog(),
-          useRootNavigator: false,
-        ),
-      );
 }
 
 class CustomDialog extends HookWidget {
@@ -210,7 +185,6 @@ class CustomDialog extends HookWidget {
             return Get.to(
               TvPlayer(
                 url: _url.value,
-                catalog: 2,
               ),
               preventDuplicates: true,
             );
@@ -233,9 +207,19 @@ class NavigationPanel extends HookWidget {
   final bool isMobile;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(
+      DiagnosticsProperty<bool>('isMobile', isMobile),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final _index = useState(2);
     return BottomNavigationBar(
+      elevation: 16,
+      backgroundColor: const Color.fromARGB(255, 30, 30, 30),
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.favorite, color: Colors.red),
@@ -258,15 +242,16 @@ class NavigationPanel extends HookWidget {
       onTap: (index) async {
         if (index == 0) {
           _index.value = index;
-          await Get.to(const FavoriteView(), preventDuplicates: true);
+          // await Get.to(const FavoriteView(), preventDuplicates: true);
+          context.read(catalog).state = 0;
         } else if (index == 1) {
           _index.value = index;
 
-          context.read(catalog).state = 0;
+          context.read(catalog).state = 1;
         } else if (index == 2) {
           _index.value = index;
 
-          context.read(catalog).state = 1;
+          context.read(catalog).state = 2;
         } else if (index == 3) {
           _index.value = index;
 
@@ -278,14 +263,6 @@ class NavigationPanel extends HookWidget {
           }
         }
       },
-    );
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(
-      DiagnosticsProperty<bool>('isMobile', isMobile),
     );
   }
 }
@@ -304,8 +281,8 @@ class IptvCatChannels extends HookWidget {
                 _country.value.toLowerCase(),
               ),
         )
-        .map(
-          (_country) => ElevatedButton(
+        .mapIndexed(
+          (index, _country) => ElevatedButton(
             onPressed: () async => Get.to<IpTvCatCountryChannelGrid>(
               IpTvCatCountryChannelGrid(countryName: _country.first),
               preventDuplicates: true,
@@ -380,7 +357,17 @@ class IptvCatChannels extends HookWidget {
 class IpTvCatCountryChannelGrid extends HookWidget {
   const IpTvCatCountryChannelGrid({this.countryName, Key key})
       : super(key: key);
+
   final String countryName;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(
+      StringProperty('countryName', countryName),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final _channel = useState('');
@@ -478,7 +465,6 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                     onPressed: () async => Get.to(
                       TvPlayer(
                         url: _channel.link,
-                        catalog: 0,
                       ),
                       preventDuplicates: true,
                     ),
@@ -525,14 +511,6 @@ class IpTvCatCountryChannelGrid extends HookWidget {
           );
         }
       },
-    );
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(
-      StringProperty('countryName', countryName),
     );
   }
 }
@@ -609,7 +587,6 @@ class IptvOrgChannels extends HookWidget {
                         onPressed: () async => Get.to(
                           TvPlayer(
                             url: _channel.url,
-                            catalog: 1,
                           ),
                           preventDuplicates: true,
                         ),
@@ -673,10 +650,8 @@ class IptvOrgChannels extends HookWidget {
 }
 
 class TvPlayer extends StatefulHookWidget {
-  const TvPlayer({@required this.url, @required this.catalog, Key key})
-      : super(key: key);
+  const TvPlayer({@required this.url, Key key}) : super(key: key);
 
-  final int catalog;
   final String url;
 
   @override
@@ -685,13 +660,29 @@ class TvPlayer extends StatefulHookWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-      ..add(IntProperty('catalog', catalog))
-      ..add(StringProperty('url', url));
+    properties.add(StringProperty('url', url));
   }
 }
 
 class _TvPlayerState extends State<TvPlayer> {
+                          child: const Text('  Click Here  '),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => setState(() => _controller.value.isPlaying
+              ? _controller.pause()
+              : _controller.play()),
+          child: Icon(
+            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          ),
+        ),
+      );
+
+
   VideoPlayerController _controller;
 
   @override
@@ -705,10 +696,12 @@ class _TvPlayerState extends State<TvPlayer> {
   @override
   void initState() {
     super.initState();
+
     _controller = VideoPlayerController.network(
-      widget.catalog == 0
-          ? widget.url.substring(0, widget.url.length - 22)
-          : widget.url,
+      // widget.catalog == 0
+      // ? widget.url.substring(0, widget.url.length - 22)
+      // :
+      widget.url.replaceAll('\u0026', '&'),
     )
       ..initialize().then((_) => setState(() {}))
       ..play();
@@ -725,17 +718,28 @@ class _TvPlayerState extends State<TvPlayer> {
                     _controller,
                   ),
                 )
-              : const CircularProgressIndicator(),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => setState(() => _controller.value.isPlaying
-              ? _controller.pause()
-              : _controller.play()),
-          child: Icon(
-            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-          ),
-        ),
-      );
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    const CircularProgressIndicator(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('If video dosent play after 10 seconds, '),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final url =
+                                //  widget.catalog == 0
+                                //     ? widget.url
+                                //         .substring(0, widget.url.length - 22)
+                                //     :
+                                widget.url.replaceAll('\u0026', '&');
+                            if (await canLaunch(url)) {
+                              await launch(url);
+                            } else {
+                              return Logger().e('Couldnt launch $url');
+                            }
+                          },
 }
 
 class FavoriteView extends HookWidget {
@@ -823,7 +827,6 @@ class FavoriteView extends HookWidget {
                             onPressed: () async => Get.to(
                               TvPlayer(
                                 url: _channel.link,
-                                catalog: 0,
                               ),
                               preventDuplicates: true,
                             ),
@@ -863,7 +866,6 @@ class FavoriteView extends HookWidget {
                             onPressed: () async => Get.to(
                               TvPlayer(
                                 url: _channel.url,
-                                catalog: 1,
                               ),
                               preventDuplicates: true,
                             ),

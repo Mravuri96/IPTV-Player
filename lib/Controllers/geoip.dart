@@ -64,7 +64,11 @@ class GetIp extends ChangeNotifier {
         .whenComplete(
           () => Logger().log(Level.debug, 'Got User Location'),
         )
-        .catchError((e) => Exception(e))
+        .catchError(
+          (e) => Exception(
+            e,
+          ),
+        )
         .then(
       (value) {
         ipResponse = IpResponse.fromJson(value.data as Map<String, dynamic>);
