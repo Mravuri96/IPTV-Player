@@ -158,7 +158,7 @@ class CustomDialog extends HookWidget {
           decoration: const InputDecoration(
             icon: Icon(Icons.link),
           ),
-          initialValue: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+          initialValue: _url.value,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onChanged: (newValue) => _url.value = newValue,
           validator: (url) => !url.startsWith('https')
@@ -208,7 +208,7 @@ class NavigationPanel extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _index = useState(2);
+    final _index = useProvider(catalog).state;
     return BottomNavigationBar(
       elevation: 16,
       backgroundColor: const Color.fromARGB(255, 30, 30, 30),
@@ -230,22 +230,21 @@ class NavigationPanel extends HookWidget {
           label: 'Bugs',
         ),
       ],
-      currentIndex: _index.value,
+      currentIndex: _index,
       onTap: (index) async {
         if (index == 0) {
-          _index.value = index;
+          // _index.value = index;
           // await Get.to(const FavoriteView(), preventDuplicates: true);
           context.read(catalog).state = 0;
         } else if (index == 1) {
-          _index.value = index;
-
+          // _index.value = index;
           context.read(catalog).state = 1;
         } else if (index == 2) {
-          _index.value = index;
+          // _index.value = index;
 
           context.read(catalog).state = 2;
         } else if (index == 3) {
-          _index.value = index;
+          // _index.value = index;
 
           const url = 'https://github.com/Mravuri96/IPTV-Player/issues';
           if (await canLaunch(url)) {
@@ -281,8 +280,8 @@ class IptvCatChannels extends HookWidget {
                 _country.value.toLowerCase(),
               ),
         )
-        .mapIndexed(
-          (index, _country) => ElevatedButton(
+        .map(
+          (_country) => ElevatedButton(
             onPressed: () async => Get.to<IpTvCatCountryChannelGrid>(
               IpTvCatCountryChannelGrid(countryName: _country.first),
               preventDuplicates: true,
@@ -370,9 +369,9 @@ class IpTvCatCountryChannelGrid extends HookWidget {
           child: CircularProgressIndicator(),
         ),
       ),
-      error: (err, _) => Scaffold(
+      error: (err, _) => const Scaffold(
         body: Center(
-          child: Text('Error: $err'),
+          child: CircularProgressIndicator(),
         ),
       ),
       data: (channels) {
@@ -467,7 +466,8 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                               _channel.channel,
                               Favorite(iptvCat: _channel),
                             )
-                            .whenComplete(() async => Scaffold.of(context)
+                            .whenComplete(() async => ScaffoldMessenger.of(
+                                    context)
                                 .showSnackBar(SnackBar(
                                     content: Text(
                                         'Added ${_channel.channel} to Favorites')))),
@@ -600,8 +600,8 @@ class IptvOrgChannels extends HookWidget {
                                       ),
                                     )
                                     .whenComplete(
-                                      () async =>
-                                          Scaffold.of(context).showSnackBar(
+                                      () async => ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             'Added ${_channel.name} to Favorites',
@@ -640,9 +640,7 @@ class IptvOrgChannels extends HookWidget {
       loading: () => const Center(
         child: CircularProgressIndicator(),
       ),
-      error: (err, _) => Text(
-        '$err',
-      ),
+      error: (_, __) => const Center(child: CircularProgressIndicator()),
     );
   }
 }
@@ -667,10 +665,10 @@ class _TvPlayerState extends State<TvPlayer> {
 
   @override
   void dispose() {
-    super.dispose();
     _controller
       ..pause()
       ..dispose();
+    super.dispose();
   }
 
   @override
@@ -682,9 +680,7 @@ class _TvPlayerState extends State<TvPlayer> {
       // ? widget.url.substring(0, widget.url.length - 22)
       // :
       widget.url.replaceAll('\u0026', '&'),
-    )
-      ..initialize().then((_) => setState(() {}))
-      ..play();
+    )..initialize().then((_) => setState(() {}));
   }
 
   @override
@@ -796,111 +792,107 @@ class FavoriteView extends HookWidget {
       body: Center(
         child: ValueListenableBuilder(
           valueListenable: Hive.box<Favorite>('Favorite').listenable(),
-          builder: (context, Box<Favorite> box, _) {
-            if (box.isEmpty) {
-              return const Text(
-                'No Favorites have been added',
-              );
-            } else {
-              return CustomScrollView(slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 400,
-                      childAspectRatio: 3 / 1,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (_, index) {
-                        final _data = box.getAt(index);
+          builder: (context, Box<Favorite> box, _) => box.isEmpty
+              ? const Text(
+                  'No favorites have been added',
+                )
+              : CustomScrollView(slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 400,
+                        childAspectRatio: 3 / 1,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (_, index) {
+                          final _data = box.getAt(index);
 
-                        if (_data.iptvCat != null) {
-                          final _channel = _data.iptvCat;
-                          return ElevatedButton(
-                            onPressed: () async => Get.to(
-                              TvPlayer(
-                                url: _channel.link,
+                          if (_data.iptvCat != null) {
+                            final _channel = _data.iptvCat;
+                            return ElevatedButton(
+                              onPressed: () async => Get.to(
+                                TvPlayer(
+                                  url: _channel.link,
+                                ),
+                                preventDuplicates: true,
                               ),
-                              preventDuplicates: true,
-                            ),
-                            child: GridTileBar(
-                              leading: IconButton(
-                                tooltip:
-                                    'Remove ${_channel.channel} from Favorites',
-                                icon: const Icon(Icons.delete_forever),
-                                onPressed: () async => box.deleteAt(index),
+                              child: GridTileBar(
+                                leading: IconButton(
+                                  tooltip:
+                                      'Remove ${_channel.channel} from Favorites',
+                                  icon: const Icon(Icons.delete_forever),
+                                  onPressed: () async => box.deleteAt(index),
+                                ),
+                                title: Text(
+                                  _channel.channel,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.black),
+                                  maxLines: 2,
+                                ),
+                                subtitle: Text(
+                                  '${int.parse(
+                                        _channel.mbps.removeSuffix(', ...'),
+                                      ) / 1000} mpbs',
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                trailing: _channel.format == 'hd'
+                                    ? const Icon(
+                                        Icons.hd,
+                                        color: Colors.black,
+                                      )
+                                    : const Icon(
+                                        Icons.fiber_dvr,
+                                        color: Colors.black,
+                                      ),
                               ),
-                              title: Text(
-                                _channel.channel,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Colors.black),
-                                maxLines: 2,
+                            );
+                          } else if (_data.iptvOrg != null) {
+                            final _channel = _data.iptvOrg;
+                            return ElevatedButton(
+                              onPressed: () async => Get.to(
+                                TvPlayer(
+                                  url: _channel.url,
+                                ),
+                                preventDuplicates: true,
                               ),
-                              subtitle: Text(
-                                '${int.parse(
-                                      _channel.mbps.removeSuffix(', ...'),
-                                    ) / 1000} mpbs',
-                                style: const TextStyle(color: Colors.black),
+                              child: GridTileBar(
+                                leading: IconButton(
+                                  tooltip:
+                                      'Remove ${_channel.name} from favorites',
+                                  icon: const Icon(Icons.delete_forever),
+                                  onPressed: () async => box.deleteAt(index),
+                                ),
+                                trailing: FadeInImage.memoryNetwork(
+                                  image: _channel?.logo ??
+                                      'https://via.placeholder.com/100',
+                                  placeholder: context.read(placeholderImage),
+                                  width: 100,
+                                  fit: BoxFit.scaleDown,
+                                ),
+                                title: Text(
+                                  _channel.name,
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                subtitle: Text(
+                                  '${_channel.country.code.toUpperCase().toFlagEmoji()} ${_channel.country.name.toUpperCase()}',
+                                  maxLines: 2,
+                                  style: const TextStyle(color: Colors.black),
+                                ),
                               ),
-                              trailing: _channel.format == 'hd'
-                                  ? const Icon(
-                                      Icons.hd,
-                                      color: Colors.black,
-                                    )
-                                  : const Icon(
-                                      Icons.fiber_dvr,
-                                      color: Colors.black,
-                                    ),
-                            ),
-                          );
-                        } else if (_data.iptvOrg != null) {
-                          final _channel = _data.iptvOrg;
-                          return ElevatedButton(
-                            onPressed: () async => Get.to(
-                              TvPlayer(
-                                url: _channel.url,
-                              ),
-                              preventDuplicates: true,
-                            ),
-                            child: GridTileBar(
-                              leading: IconButton(
-                                tooltip:
-                                    'Remove ${_channel.name} from Favorites',
-                                icon: const Icon(Icons.delete_forever),
-                                onPressed: () async => box.deleteAt(index),
-                              ),
-                              trailing: FadeInImage.memoryNetwork(
-                                image: _channel?.logo ??
-                                    'https://via.placeholder.com/100',
-                                placeholder: context.read(placeholderImage),
-                                width: 100,
-                                fit: BoxFit.scaleDown,
-                              ),
-                              title: Text(
-                                _channel.name,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                              subtitle: Text(
-                                '${_channel.country.code.toUpperCase().toFlagEmoji()} ${_channel.country.name.toUpperCase()}',
-                                maxLines: 2,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          );
-                        } else {
-                          return const SizedBox.shrink();
-                        }
-                      },
-                      childCount: box.length,
+                            );
+                          } else {
+                            return const SizedBox.shrink();
+                          }
+                        },
+                        childCount: box.length,
+                      ),
                     ),
                   ),
-                ),
-              ]);
-            }
-          },
+                ]),
         ),
       ),
     );
