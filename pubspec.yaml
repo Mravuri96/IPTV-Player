@@ -18,6 +18,7 @@ dependencies:
   dio_http2_adapter:
   dio_flutter_transformer:
   freezed_annotation:
+  google_fonts:
   logger:
   meta:
   intl:
@@ -61,7 +62,7 @@ flutter:
   assets:
     - assets/streams.zip
     - assets/channels.zip
-    
+      
 scripts:
   build: flutter pub run build_runner build --release --delete-conflicting-outputs
   watch: flutter pub run build_runner build --watch --delete-conflicting-outputs

@@ -3,6 +3,8 @@ import 'dart:async' show Future, runZonedGuarded;
 import 'package:animations/animations.dart'
     show FadeThroughTransition, PageTransitionSwitcher;
 import 'package:dartx/dartx.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart'
     show
         DiagnosticPropertiesBuilder,
@@ -10,10 +12,6 @@ import 'package:flutter/foundation.dart'
         Key,
         StringProperty,
         required;
-
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/route_manager.dart';
@@ -25,6 +23,7 @@ import 'package:url_launcher/url_launcher.dart' show canLaunch, launch;
 import 'package:video_player/video_player.dart'
     show VideoPlayer, VideoPlayerController;
 
+import 'Controllers/analytics.dart';
 import 'Controllers/catalog_provider.dart' show catalog;
 import 'Controllers/geoip.dart' show GetIp;
 import 'Controllers/iptv_cat.dart' show countryData;
@@ -33,6 +32,7 @@ import 'Controllers/placeholder_provider.dart' show placeholderImage;
 import 'Models/channels.dart' show ChannelsAdapter, CountryAdapter, TvgAdapter;
 import 'Models/favorite.dart' show Favorite, FavoriteAdapter;
 import 'Models/iptvcat_model.dart' show IPTVCATMODELAdapter;
+import 'Routing/routegen.dart';
 import 'Theme/theme.dart' show darkTheme;
 import 'Util/countires.dart' show countries;
 import 'Util/util.dart';
@@ -76,20 +76,27 @@ Future<void> main() async {
 
 class Root extends HookWidget {
   const Root({Key key}) : super(key: key);
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
-  static FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: analytics);
+
   @override
-  Widget build(BuildContext context) => FutureBuilder<void>(
-        future: Future.sync(() => GetIp().figureOut()),
-        builder: (context, __) => GetMaterialApp(
-          themeMode: ThemeMode.dark,
-          darkTheme: darkTheme,
-          title: '📺 IPTV',
-          navigatorObservers: <NavigatorObserver>[observer],
-          home: const Home(),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final _observer = useProvider(analyticsProvider);
+    return FutureBuilder<void>(
+      future: Future.wait([
+        GetIp().figureOut(),
+        _observer.setCurrentScreen(screenName: 'home'),
+      ]),
+      builder: (context, __) => GetMaterialApp(
+        themeMode: ThemeMode.dark,
+        darkTheme: darkTheme,
+        title: '📺 IPTV',
+        onGenerateRoute: RouteGenerator.genRoute,
+        navigatorObservers: <NavigatorObserver>[
+          FirebaseAnalyticsObserver(analytics: _observer)
+        ],
+        initialRoute: '/',
+      ),
+    );
+  }
 }
 
 class Home extends HookWidget {
@@ -182,10 +189,8 @@ class CustomDialog extends HookWidget {
             Get.back(
               closeOverlays: true,
             );
-            return Get.to(
-              TvPlayer(
-                url: _url.value,
-              ),
+            return Get.toNamed(
+              '/watch?${_url.value}?${_url.value}',
               preventDuplicates: true,
             );
           },
@@ -451,10 +456,8 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                 itemBuilder: (context, index) {
                   final _channel = _channelList.elementAt(index);
                   return ElevatedButton(
-                    onPressed: () async => Get.to(
-                      TvPlayer(
-                        url: _channel.link,
-                      ),
+                    onPressed: () async => Get.toNamed(
+                      '/watch?${_channel.channel}?${_channel.link}',
                       preventDuplicates: true,
                     ),
                     child: GridTileBar(
@@ -582,10 +585,8 @@ class IptvOrgChannels extends HookWidget {
                     (_, index) {
                       final _channel = _channelList.elementAt(index);
                       return ElevatedButton(
-                        onPressed: () async => Get.to(
-                          TvPlayer(
-                            url: _channel.url,
-                          ),
+                        onPressed: () async => Get.toNamed(
+                          '/watch?${_channel.name}?${_channel.url}',
                           preventDuplicates: true,
                         ),
                         child: GridTileBar(
@@ -646,9 +647,10 @@ class IptvOrgChannels extends HookWidget {
 }
 
 class TvPlayer extends StatefulHookWidget {
-  const TvPlayer({@required this.url, Key key}) : super(key: key);
+  const TvPlayer({@required this.url, @required this.title, Key key})
+      : super(key: key);
 
-  final String url;
+  final String url, title;
 
   @override
   _TvPlayerState createState() => _TvPlayerState();
@@ -656,18 +658,21 @@ class TvPlayer extends StatefulHookWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(StringProperty('url', url));
+    properties
+      ..add(StringProperty('url', url))
+      ..add(StringProperty('title', title));
   }
 }
 
 class _TvPlayerState extends State<TvPlayer> {
-  VideoPlayerController _controller;
+  static VideoPlayerController _controller;
 
   @override
   void dispose() {
     _controller
       ..pause()
       ..dispose();
+
     super.dispose();
   }
 
@@ -684,54 +689,62 @@ class _TvPlayerState extends State<TvPlayer> {
   }
 
   @override
-  Scaffold build(BuildContext context) => Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: _controller.value.initialized
-              ? AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(
-                    _controller,
-                  ),
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    const CircularProgressIndicator(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('If video dosent play after 10 seconds, '),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final url =
-                                //  widget.catalog == 0
-                                //     ? widget.url
-                                //         .substring(0, widget.url.length - 22)
-                                //     :
-                                widget.url.replaceAll('\u0026', '&');
-                            if (await canLaunch(url)) {
-                              await launch(url);
-                            } else {
-                              return Logger().e('Couldnt launch $url');
-                            }
-                          },
-                          child: const Text('  Click Here  '),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+  Scaffold build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: FutureBuilder(
+            future: useProvider(analyticsProvider)
+                .logEvent(name: 'screenName', parameters: {
+              'channel': widget.title,
+              'url': widget.url,
+            }),
+            builder: (context, _) => _controller.value.initialized
+                ? AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(
+                      _controller,
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      const CircularProgressIndicator(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('If video dosent play after 10 seconds, '),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final url =
+                                  //  widget.catalog == 0
+                                  //     ? widget.url
+                                  //         .substring(0, widget.url.length - 22)
+                                  //     :
+                                  widget.url.replaceAll('\u0026', '&');
+                              if (await canLaunch(url)) {
+                                await launch(url);
+                              } else {
+                                return Logger().e('Couldnt launch $url');
+                              }
+                            },
+                            child: const Text('  Click Here  '),
+                          ),
+                        ],
+                      )
+                    ],
+                  )),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => setState(() => _controller.value.isPlaying
+            ? _controller.pause()
+            : _controller.play()),
+        child: Icon(
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => setState(() => _controller.value.isPlaying
-              ? _controller.pause()
-              : _controller.play()),
-          child: Icon(
-            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-          ),
-        ),
-      );
+      ),
+    );
+  }
 }
 
 class FavoriteView extends HookWidget {
@@ -814,10 +827,8 @@ class FavoriteView extends HookWidget {
                           if (_data.iptvCat != null) {
                             final _channel = _data.iptvCat;
                             return ElevatedButton(
-                              onPressed: () async => Get.to(
-                                TvPlayer(
-                                  url: _channel.link,
-                                ),
+                              onPressed: () async => Get.toNamed(
+                                '/watch?${_channel.channel}?${_channel.link}',
                                 preventDuplicates: true,
                               ),
                               child: GridTileBar(
@@ -853,10 +864,8 @@ class FavoriteView extends HookWidget {
                           } else if (_data.iptvOrg != null) {
                             final _channel = _data.iptvOrg;
                             return ElevatedButton(
-                              onPressed: () async => Get.to(
-                                TvPlayer(
-                                  url: _channel.url,
-                                ),
+                              onPressed: () async => Get.toNamed(
+                                '/watch?${_channel.name}?${_channel.url}',
                                 preventDuplicates: true,
                               ),
                               child: GridTileBar(

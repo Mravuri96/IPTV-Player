@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 ThemeData get darkTheme => ThemeData.dark().copyWith(
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -16,6 +17,7 @@ ThemeData get darkTheme => ThemeData.dark().copyWith(
         selectedIconTheme: const IconThemeData().copyWith(
           color: const Color(0xffFCCFA8),
         ),
+        unselectedLabelStyle: const TextStyle(color: Colors.grey),
         selectedItemColor: const Color(0xffFCCFA8),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -26,5 +28,12 @@ ThemeData get darkTheme => ThemeData.dark().copyWith(
           // ),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         ),
+      ),
+      textTheme: GoogleFonts.comfortaaTextTheme(
+        ThemeData(
+          primarySwatch: Colors.teal,
+          primaryColor: Colors.black,
+          brightness: Brightness.dark,
+        ).textTheme,
       ),
     );
