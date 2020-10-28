@@ -21,7 +21,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart' show Logger;
 import 'package:url_launcher/url_launcher.dart' show canLaunch, launch;
 import 'package:video_player/video_player.dart'
-    show VideoPlayer, VideoPlayerController;
+    show VideoPlayer;
 
 import 'Controllers/analytics.dart';
 import 'Controllers/catalog_provider.dart' show catalog;
@@ -29,6 +29,7 @@ import 'Controllers/geoip.dart' show GetIp;
 import 'Controllers/iptv_cat.dart' show countryData;
 import 'Controllers/iptv_org.dart' show ipTvOrgCatalog;
 import 'Controllers/placeholder_provider.dart' show placeholderImage;
+import 'Controllers/video_controller.dart';
 import 'Models/channels.dart' show ChannelsAdapter, CountryAdapter, TvgAdapter;
 import 'Models/favorite.dart' show Favorite, FavoriteAdapter;
 import 'Models/iptvcat_model.dart' show IPTVCATMODELAdapter;
@@ -646,14 +647,14 @@ class IptvOrgChannels extends HookWidget {
   }
 }
 
-class TvPlayer extends StatefulHookWidget {
+class TvPlayer extends HookWidget {
   const TvPlayer({@required this.url, @required this.title, Key key})
       : super(key: key);
 
   final String url, title;
 
-  @override
-  _TvPlayerState createState() => _TvPlayerState();
+//   @override
+//   _TvPlayerState createState() => _TvPlayerState();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -662,42 +663,43 @@ class TvPlayer extends StatefulHookWidget {
       ..add(StringProperty('url', url))
       ..add(StringProperty('title', title));
   }
-}
+// }
 
-class _TvPlayerState extends State<TvPlayer> {
-  static VideoPlayerController _controller;
+// class _TvPlayerState extends State<TvPlayer> {
+//   static VideoPlayerController _controller;
 
-  @override
-  void dispose() {
-    _controller
-      ..pause()
-      ..dispose();
+//   @override
+//   void dispose() {
+//     _controller
+//       ..pause()
+//       ..dispose();
 
-    super.dispose();
-  }
+//     super.dispose();
+//   }
 
-  @override
-  void initState() {
-    super.initState();
+//   @override
+//   void initState() {
+//     super.initState();
 
-    _controller = VideoPlayerController.network(
-      // widget.catalog == 0
-      // ? widget.url.substring(0, widget.url.length - 22)
-      // :
-      widget.url.replaceAll('\u0026', '&'),
-    )..initialize().then((_) => setState(() {}));
-  }
+//     _controller = VideoPlayerController.network(
+//       // widget.catalog == 0
+//       // ? widget.url.substring(0, widget.url.length - 22)
+//       // :
+//       widget.url.replaceAll('\u0026', '&'),
+//     )..initialize().then((_) => setState(() {}));
+//   }
 
   @override
   Scaffold build(BuildContext context) {
+    final _controller = useProvider(videoPlayer(url));
     return Scaffold(
       appBar: AppBar(),
       body: Center(
         child: FutureBuilder(
             future: useProvider(analyticsProvider)
                 .logEvent(name: 'screenName', parameters: {
-              'channel': widget.title,
-              'url': widget.url,
+              'channel': title,
+              'url': url,
             }),
             builder: (context, _) => _controller.value.initialized
                 ? AspectRatio(
@@ -716,16 +718,16 @@ class _TvPlayerState extends State<TvPlayer> {
                           const Text('If video dosent play after 10 seconds, '),
                           ElevatedButton(
                             onPressed: () async {
-                              final url =
-                                  //  widget.catalog == 0
-                                  //     ? widget.url
-                                  //         .substring(0, widget.url.length - 22)
+                              final _url =
+                                  //  catalog == 0
+                                  //     ? url
+                                  //         .substring(0, url.length - 22)
                                   //     :
-                                  widget.url.replaceAll('\u0026', '&');
-                              if (await canLaunch(url)) {
-                                await launch(url);
+                                  url.replaceAll('\u0026', '&');
+                              if (await canLaunch(_url)) {
+                                await launch(_url);
                               } else {
-                                return Logger().e('Couldnt launch $url');
+                                return Logger().e('Couldnt launch $_url');
                               }
                             },
                             child: const Text('  Click Here  '),
@@ -736,9 +738,11 @@ class _TvPlayerState extends State<TvPlayer> {
                   )),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => setState(() => _controller.value.isPlaying
-            ? _controller.pause()
-            : _controller.play()),
+        onPressed: () =>
+            // setState(() => _controller.value.isPlaying
+            context.read(videoPlayer(url)).value.isPlaying
+                ? context.read(videoPlayer(url)).pause()
+                : context.read(videoPlayer(url)).play(),
         child: Icon(
           _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
         ),
