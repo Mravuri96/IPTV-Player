@@ -1,4 +1,4 @@
-name: IPTV
+name: iptv
 description: IPTV Viewer
 
 publish_to: "none"
@@ -9,9 +9,9 @@ environment:
   flutter:
 
 dependencies:
+  animations:
   flutter:
     sdk: flutter
-  animations:
   cupertino_icons:
   dio:
   dio_cookie_manager:
@@ -50,18 +50,18 @@ dev_dependencies:
   freezed:
   quiver:
   hive_generator:
-  retrofit_generator:
   json_serializable:
   pedantic:
   effective_dart:
-  firebase_core: "^0.5.0+1"
-  firebase_analytics: "^6.0.2"
+  firebase_core: 
+  firebase_analytics: 
   
 flutter:
   uses-material-design: true
   assets:
     - assets/streams.zip
     - assets/channels.zip
+    - assets/flags/
       
 scripts:
   build: flutter pub run build_runner build --release --delete-conflicting-outputs

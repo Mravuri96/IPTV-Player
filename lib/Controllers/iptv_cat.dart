@@ -29,18 +29,19 @@ final countryData = $_autoDisposeFamily<List<IPTVCATMODEL>, String>(
         .decode(
           String.fromCharCodes(
             ref
-                .watch(ipTvCatCatalog)
-                .whenData(
-                  (archive) => archive
-                      .firstWhere(
-                        (file) => file.name.toLowerCase().contains(
-                              countryName.toLowerCase().trim(),
-                            ),
-                      )
-                      .content as Iterable<int>,
-                )
-                ?.data
-                ?.value,
+                    .watch(ipTvCatCatalog)
+                    .whenData(
+                      (archive) => archive
+                          .firstWhere(
+                            (file) => file.name.toLowerCase().contains(
+                                  countryName.toLowerCase().trim(),
+                                ),
+                          )
+                          .content as Iterable<int>,
+                    )
+                    ?.data
+                    ?.value ??
+                [],
           ),
         )
         .map(

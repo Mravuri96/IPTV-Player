@@ -9,7 +9,7 @@ final videoPlayer =
     url.replaceAll('\u0026', '&'),
   )
     ..initialize()
-    ;
+    ..play();
 
   ref
     ..onDispose(() => _controller

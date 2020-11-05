@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart'
         StringProperty,
         required;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/route_manager.dart';
 import 'package:hive/hive.dart';
@@ -20,8 +21,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart' show Logger;
 import 'package:url_launcher/url_launcher.dart' show canLaunch, launch;
-import 'package:video_player/video_player.dart'
-    show VideoPlayer;
+import 'package:video_player/video_player.dart' show VideoPlayer;
 
 import 'Controllers/analytics.dart';
 import 'Controllers/catalog_provider.dart' show catalog;
@@ -293,9 +293,27 @@ class IptvCatChannels extends HookWidget {
               preventDuplicates: true,
             ),
             child: GridTileBar(
-              leading: Text(
-                _country.last.toUpperCase().toFlagEmoji(),
-                textScaleFactor: 3,
+              leading: Image(
+                image: AssetImage(
+                  'assets/flags/${_country.last.toUpperCase()}.png',
+                ),
+                errorBuilder: (context, error, stackTrace) => Text(
+                  _country.last.toUpperCase().toFlagEmoji(),
+                  textScaleFactor: 3,
+                ),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes
+                          : null,
+                    ),
+                  );
+                },
               ),
               title: Text(
                 _country.first.toUpperCase(),
@@ -470,11 +488,15 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                               _channel.channel,
                               Favorite(iptvCat: _channel),
                             )
-                            .whenComplete(() async => ScaffoldMessenger.of(
-                                    context)
-                                .showSnackBar(SnackBar(
-                                    content: Text(
-                                        'Added ${_channel.channel} to Favorites')))),
+                            .whenComplete(
+                              () async =>
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Added ${_channel.channel} to Favorites'),
+                                ),
+                              ),
+                            ),
                       ),
                       title: Text(
                         _channel.channel,
@@ -623,10 +645,44 @@ class IptvOrgChannels extends HookWidget {
                             _channel.name,
                             style: const TextStyle(color: Colors.black),
                           ),
-                          subtitle: Text(
-                            '${_channel.country.code.toUpperCase().toFlagEmoji()} ${_channel.country.name.toUpperCase()}',
-                            maxLines: 2,
-                            style: const TextStyle(color: Colors.black),
+                          subtitle: Row(
+                            children: [
+                              Image(
+                                height: 16,
+                                image: AssetImage(
+                                  'assets/flags/${_channel.country.code.toUpperCase()}.png',
+                                ),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Text(
+                                  _channel.country.code
+                                      .toUpperCase()
+                                      .toFlagEmoji(),
+                                  textScaleFactor: 3,
+                                ),
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  }
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress
+                                                  .expectedTotalBytes !=
+                                              null
+                                          ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
+                              Text(
+                                ' ${_channel.country.name.toUpperCase()}',
+                                maxLines: 2,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -890,10 +946,46 @@ class FavoriteView extends HookWidget {
                                   _channel.name,
                                   style: const TextStyle(color: Colors.black),
                                 ),
-                                subtitle: Text(
-                                  '${_channel.country.code.toUpperCase().toFlagEmoji()} ${_channel.country.name.toUpperCase()}',
-                                  maxLines: 2,
-                                  style: const TextStyle(color: Colors.black),
+                                subtitle: Row(
+                                  children: [
+                                    Image(
+                                      height: 16,
+                                      image: AssetImage(
+                                        'assets/flags/${_channel.country.code.toUpperCase()}.png',
+                                      ),
+                                      errorBuilder:
+                                          (context, error, stackTrace) => Text(
+                                        _channel.country.code
+                                            .toUpperCase()
+                                            .toFlagEmoji(),
+                                        textScaleFactor: 3,
+                                      ),
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes
+                                                : null,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    Text(
+                                      ' ${_channel.country.name.toUpperCase()}',
+                                      maxLines: 2,
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
