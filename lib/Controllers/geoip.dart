@@ -7,6 +7,7 @@ import 'package:logger/logger.dart' show Level, Logger;
 
 import '../models/IPResponse/ip_response.dart' show IpResponse;
 
+//Using this to determine a good hosting location
 class GetIp extends ChangeNotifier {
   IpResponse _ipResponse;
 

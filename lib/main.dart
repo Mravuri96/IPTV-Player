@@ -159,7 +159,7 @@ class CustomDialog extends HookWidget {
     final _url = useState('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8');
 
     return AlertDialog(
-      title: const Text('Enter .m3u8 url'),
+      title: const Text('Enter a valid stream url'),
       content: SizedBox(
         width: MediaQuery.of(context).size.width * .9,
         child: TextFormField(
@@ -169,11 +169,7 @@ class CustomDialog extends HookWidget {
           initialValue: _url.value,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onChanged: (newValue) => _url.value = newValue,
-          validator: (url) => !url.startsWith('https')
-              ? 'url must start with https'
-              : !url.endsWith('.m3u8')
-                  ? 'url must end with .m3u8'
-                  : null,
+          validator: (url) =>  url.isNotNullOrEmpty ? 'Url cant be empty': null,
         ),
       ),
       actions: [
