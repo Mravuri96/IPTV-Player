@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base href="/" />
+    <meta charset="UTF-8" />
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
+    <meta name="description" content="IPTV Viewer" />
+
+    <!-- Prelaods -->
+
+    <link rel="preload" href="style.css" as="style" />
+    <link rel="preload" href="main.dart.js" as="script" />
+
+    <!-- iOS meta tags & icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="IPTV" />
+    <link rel="apple-touch-icon" href="icons/Icon-192.png" />
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+
+    <title>📺 IPTV</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/hls.js@latest"
+      type="application/javascript"
+    ></script>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-analytics.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-performance.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      var firebaseConfig = {
+        apiKey: "AIzaSyCmIhLkqSq7eG9cm4boLYcv2nKujSqFMX8",
+        authDomain: "iptv-5f88c.firebaseapp.com",
+        databaseURL: "https://iptv-5f88c.firebaseio.com",
+        projectId: "iptv-5f88c",
+        storageBucket: "iptv-5f88c.appspot.com",
+        messagingSenderId: "755513039589",
+        appId: "1:755513039589:web:4059c61345cabd65cf920c",
+        measurementId: "G-PZJ4WECPVW",
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      firebase.analytics();
+      firebase.performance();
+    </script>
+    <script>
+      if (typeof firebase.analytics !== "function") {
+        firebase.analytics = () =>
+          console.log(
+            "Adblocker detected. Created fake analytics so the app doesn't crash."
+          );
+      }
+    </script>
+  </head>
+
+  <body>
+    <noscript>Please enable JavaScript!</noscript>
+    <div class="sk-cube-grid">
+      <div class="sk-cube sk-cube1"></div>
+      <div class="sk-cube sk-cube2"></div>
+      <div class="sk-cube sk-cube3"></div>
+      <div class="sk-cube sk-cube4"></div>
+      <div class="sk-cube sk-cube5"></div>
+      <div class="sk-cube sk-cube6"></div>
+      <div class="sk-cube sk-cube7"></div>
+      <div class="sk-cube sk-cube8"></div>
+      <div class="sk-cube sk-cube9"></div>
+    </div>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("flutter-first-frame", function () {
+          navigator.serviceWorker.register("flutter_service_worker.js");
+        });
+      }
+    </script>
+    <script src="main.dart.js" type="application/javascript" defer></script>
+  </body>
+</html>
