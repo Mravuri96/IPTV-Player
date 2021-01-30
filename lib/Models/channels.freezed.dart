@@ -64,6 +64,7 @@ mixin _$Channels {
   Tvg get tvg;
 
   Map<String, dynamic> toJson();
+  @JsonKey(ignore: true)
   $ChannelsCopyWith<Channels> get copyWith;
 }
 
@@ -265,6 +266,7 @@ class _$_Channels implements _Channels {
       const DeepCollectionEquality().hash(country) ^
       const DeepCollectionEquality().hash(tvg);
 
+  @JsonKey(ignore: true)
   @override
   _$ChannelsCopyWith<_Channels> get copyWith =>
       __$ChannelsCopyWithImpl<_Channels>(this, _$identity);
@@ -309,6 +311,7 @@ abstract class _Channels implements Channels {
   @HiveField(6)
   Tvg get tvg;
   @override
+  @JsonKey(ignore: true)
   _$ChannelsCopyWith<_Channels> get copyWith;
 }
 
@@ -346,6 +349,7 @@ mixin _$Country {
   String get name;
 
   Map<String, dynamic> toJson();
+  @JsonKey(ignore: true)
   $CountryCopyWith<Country> get copyWith;
 }
 
@@ -443,6 +447,7 @@ class _$_Country implements _Country {
       const DeepCollectionEquality().hash(code) ^
       const DeepCollectionEquality().hash(name);
 
+  @JsonKey(ignore: true)
   @override
   _$CountryCopyWith<_Country> get copyWith =>
       __$CountryCopyWithImpl<_Country>(this, _$identity);
@@ -466,6 +471,7 @@ abstract class _Country implements Country {
   @HiveField(1)
   String get name;
   @override
+  @JsonKey(ignore: true)
   _$CountryCopyWith<_Country> get copyWith;
 }
 
@@ -509,6 +515,7 @@ mixin _$Tvg {
   String get url;
 
   Map<String, dynamic> toJson();
+  @JsonKey(ignore: true)
   $TvgCopyWith<Tvg> get copyWith;
 }
 
@@ -622,6 +629,7 @@ class _$_Tvg implements _Tvg {
       const DeepCollectionEquality().hash(name) ^
       const DeepCollectionEquality().hash(url);
 
+  @JsonKey(ignore: true)
   @override
   _$TvgCopyWith<_Tvg> get copyWith =>
       __$TvgCopyWithImpl<_Tvg>(this, _$identity);
@@ -650,5 +658,6 @@ abstract class _Tvg implements Tvg {
   @HiveField(2)
   String get url;
   @override
+  @JsonKey(ignore: true)
   _$TvgCopyWith<_Tvg> get copyWith;
 }

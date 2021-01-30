@@ -3,7 +3,7 @@ include: ./linter_rules.yaml
 analyzer:
   # enable-experiment:
   #   - non-nullable
-  exclude: [lib/*/*.g.dart, lib/*/*.freezed.dart, ]
+  exclude: [lib/*/*.g.dart, lib/*/*.freezed.dart]
   strong-mode:
     implicit-casts: true
     implicit-dynamic: true
@@ -15,7 +15,7 @@ analyzer:
     invalid_assignment: warning
     missing_return: error
     dead_code: info
-    
+
 linter:
   rules:
     # Conflicts with `prefer_single_quotes`

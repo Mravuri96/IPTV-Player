@@ -58,18 +58,10 @@ class GetIp extends ChangeNotifier {
           BaseOptions(baseUrl: 'https://get.geojs.io', connectTimeout: 5)
       ..transformer = FlutterTransformer();
 
-    final resp = await dio
+    await dio
         .get(
-          '/v1/ip/geo.json',
-        )
-        .whenComplete(
-          () => Logger().log(Level.debug, 'Got User Location'),
-        )
-        .catchError(
-          (e) => Exception(
-            e,
-          ),
-        )
+      '/v1/ip/geo.json',
+    )
         .then(
       (value) {
         ipResponse = IpResponse.fromJson(value.data as Map<String, dynamic>);
@@ -79,6 +71,5 @@ class GetIp extends ChangeNotifier {
         return ipResponse;
       },
     );
-    return resp;
   }
 }

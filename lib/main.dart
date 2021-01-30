@@ -70,7 +70,7 @@ Future<void> main() async {
           child: Root(),
         ),
       ),
-      (err, stk) => Logger().e('$err $stk'),
+      (err, stk) => null,
     ),
   );
 }
@@ -169,7 +169,7 @@ class CustomDialog extends HookWidget {
           initialValue: _url.value,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onChanged: (newValue) => _url.value = newValue,
-          validator: (url) =>  url.isNotNullOrEmpty ? 'Url cant be empty': null,
+          validator: (url) => url.isNullOrEmpty ? 'Url cant be empty' : null,
         ),
       ),
       actions: [
@@ -234,27 +234,48 @@ class NavigationPanel extends HookWidget {
       ],
       currentIndex: _index,
       onTap: (index) async {
-        if (index == 0) {
-          // _index.value = index;
-          // await Get.to(const FavoriteView(), preventDuplicates: true);
-          context.read(catalog).state = 0;
-        } else if (index == 1) {
-          // _index.value = index;
-          context.read(catalog).state = 1;
-        } else if (index == 2) {
-          // _index.value = index;
-
-          context.read(catalog).state = 2;
-        } else if (index == 3) {
-          // _index.value = index;
-
-          const url = 'https://github.com/Mravuri96/IPTV-Player/issues';
-          if (await canLaunch(url)) {
-            await launch(url);
-          } else {
-            return Logger().e('Couldnt launch $url');
-          }
+        switch (index) {
+          case 0:
+            context.read(catalog).state = 0;
+            break;
+          case 1:
+            context.read(catalog).state = 1;
+            break;
+          case 2:
+            context.read(catalog).state = 2;
+            break;
+          case 3:
+            const url = 'https://github.com/Mravuri96/IPTV-Player/issues';
+            if (await canLaunch(url)) {
+              await launch(url);
+            } else {
+              return Logger().e('Couldnt launch $url');
+            }
+            break;
+          default:
+            break;
         }
+        // if (index == 0) {
+        //   // _index.value = index;
+        //   // await Get.to(const FavoriteView(), preventDuplicates: true);
+        //   context.read(catalog).state = 0;
+        // } else if (index == 1) {
+        //   // _index.value = index;
+        //   context.read(catalog).state = 1;
+        // } else if (index == 2) {
+        //   // _index.value = index;
+
+        //   context.read(catalog).state = 2;
+        // } else if (index == 3) {
+        //   // _index.value = index;
+
+        //   const url = 'https://github.com/Mravuri96/IPTV-Player/issues';
+        //   if (await canLaunch(url)) {
+        //     await launch(url);
+        //   } else {
+        //     return Logger().e('Couldnt launch $url');
+        //   }
+        // }
       },
     );
   }
@@ -336,6 +357,8 @@ class IptvCatChannels extends HookWidget {
                 focusColor: Colors.grey,
                 fillColor: Colors.grey,
                 hoverColor: Colors.grey,
+                hintText: 'Search by country',
+                hintStyle: TextStyle(color: Colors.black),
                 prefixIcon: Icon(
                   Icons.search,
                   color: Colors.black,
@@ -426,6 +449,8 @@ class IpTvCatCountryChannelGrid extends HookWidget {
                     focusColor: Colors.grey,
                     fillColor: Colors.grey,
                     hoverColor: Colors.grey,
+                    hintText: 'Search by channel name',
+                    hintStyle: TextStyle(color: Colors.black),
                     prefixIcon: Icon(
                       Icons.search,
                       color: Colors.black,
@@ -555,7 +580,11 @@ class IptvOrgChannels extends HookWidget {
                   ) ||
               element.country.code.toLowerCase().contains(
                     _query.value.toLowerCase(),
-                  ),
+                  ) ||
+              (element?.category?.toLowerCase()?.contains(
+                        _query.value.toLowerCase(),
+                      ) ??
+                  false),
         );
         return Scaffold(
           body: CustomScrollView(
@@ -573,6 +602,8 @@ class IptvOrgChannels extends HookWidget {
                       focusColor: Colors.grey,
                       fillColor: Colors.grey,
                       hoverColor: Colors.grey,
+                      hintText: 'Search by country, channel, or category',
+                      hintStyle: TextStyle(color: Colors.black),
                       prefixIcon: Icon(
                         Icons.search,
                         color: Colors.black,
@@ -790,7 +821,7 @@ class TvPlayer extends HookWidget {
                   )),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
+        onPressed: () async =>
             // setState(() => _controller.value.isPlaying
             context.read(videoPlayer(url)).value.isPlaying
                 ? context.read(videoPlayer(url)).pause()
@@ -831,8 +862,10 @@ class FavoriteView extends HookWidget {
                   ),
                 ),
                 actions: <Widget>[
-                  RaisedButton(
-                    color: Theme.of(context).cardColor,
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).cardColor,
+                    ),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -840,8 +873,10 @@ class FavoriteView extends HookWidget {
                       'Cancel',
                     ),
                   ),
-                  RaisedButton(
-                    color: Theme.of(context).cardColor,
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).cardColor,
+                    ),
                     onPressed: () async {
                       await Hive.box<Favorite>('Favorite').clear();
                       // await _bannerAd?.dispose();

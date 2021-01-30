@@ -1,6 +1,5 @@
 extension Util on String {
   static const _flagOffSet = 0x1F1E6, _asciiOffSet = 0x41;
-
   String toFlagEmoji() {
     if (this == 'UK') {
       return '🇬🇧';

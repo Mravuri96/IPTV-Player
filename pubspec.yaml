@@ -4,8 +4,9 @@ description: IPTV Viewer
 publish_to: "none"
 
 version: 1.0.0+1
+
 environment:
-  sdk:
+  sdk: ">=2.10.0 <3.0.0"
   flutter:
 
 dependencies:
@@ -40,6 +41,7 @@ dependencies:
   url_launcher:
   hive:
   hive_flutter:
+  video_viewer:
 
 dev_dependencies:
   flutter_test:
@@ -53,16 +55,16 @@ dev_dependencies:
   json_serializable:
   pedantic:
   effective_dart:
-  firebase_core: 
-  firebase_analytics: 
-  
+  firebase_core:
+  firebase_analytics:
+
 flutter:
   uses-material-design: true
   assets:
     - assets/streams.zip
     - assets/channels.zip
     - assets/flags/
-      
+
 scripts:
   build: flutter pub run build_runner build --release --delete-conflicting-outputs
   watch: flutter pub run build_runner build --watch --delete-conflicting-outputs

@@ -136,6 +136,7 @@ mixin _$IpResponse {
   String get latitude;
 
   Map<String, dynamic> toJson();
+  @JsonKey(ignore: true)
   $IpResponseCopyWith<IpResponse> get copyWith;
 }
 
@@ -479,6 +480,7 @@ class _$_IpResponse implements _IpResponse {
       const DeepCollectionEquality().hash(countryCode) ^
       const DeepCollectionEquality().hash(latitude);
 
+  @JsonKey(ignore: true)
   @override
   _$IpResponseCopyWith<_IpResponse> get copyWith =>
       __$IpResponseCopyWithImpl<_IpResponse>(this, _$identity);
@@ -596,5 +598,6 @@ abstract class _IpResponse implements IpResponse {
   @nullable
   String get latitude;
   @override
+  @JsonKey(ignore: true)
   _$IpResponseCopyWith<_IpResponse> get copyWith;
 }

@@ -7,9 +7,7 @@ final videoPlayer =
     $_autoDisposeFamily<VideoPlayerController, String>((ref, url) {
   final _controller = VideoPlayerController.network(
     url.replaceAll('\u0026', '&'),
-  )
-    ..initialize()
-    ..play();
+  )..initialize();
 
   ref
     ..onDispose(() => _controller

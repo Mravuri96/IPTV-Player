@@ -76,6 +76,7 @@ mixin _$IPTVCATMODEL {
   List<String> get uri;
 
   Map<String, dynamic> toJson();
+  @JsonKey(ignore: true)
   $IPTVCATMODELCopyWith<IPTVCATMODEL> get copyWith;
 }
 
@@ -295,6 +296,7 @@ class _$_IPTVCATMODEL implements _IPTVCATMODEL {
       const DeepCollectionEquality().hash(mbps) ^
       const DeepCollectionEquality().hash(uri);
 
+  @JsonKey(ignore: true)
   @override
   _$IPTVCATMODELCopyWith<_IPTVCATMODEL> get copyWith =>
       __$IPTVCATMODELCopyWithImpl<_IPTVCATMODEL>(this, _$identity);
@@ -352,5 +354,6 @@ abstract class _IPTVCATMODEL implements IPTVCATMODEL {
   @HiveField(9)
   List<String> get uri;
   @override
+  @JsonKey(ignore: true)
   _$IPTVCATMODELCopyWith<_IPTVCATMODEL> get copyWith;
 }

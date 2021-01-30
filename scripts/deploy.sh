@@ -7,6 +7,6 @@ flutter packages upgrade
 
 derry build
 
-flutter build web --no-source-maps --release --csp
+flutter build web --no-source-maps --release --csp --tree-shake-icons
 
 firebase deploy
